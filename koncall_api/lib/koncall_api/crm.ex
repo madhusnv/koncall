@@ -141,7 +141,7 @@ defmodule KoncallApi.CRM do
   def import_leads(org_id, branch_id, leads_data, opts \\ []) when is_list(leads_data) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
     
-    distribution_strategy = Keyword.get(opts, :distribution_strategy, :none)
+    _distribution_strategy = Keyword.get(opts, :distribution_strategy, :none)
     counsellors_cycle = get_distribution_cycle(branch_id, opts)
     
     results = 
