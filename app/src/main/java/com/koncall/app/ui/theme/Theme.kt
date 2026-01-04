@@ -5,49 +5,74 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// KonCall Premium Dark Color Scheme
+private val KonCallDarkColorScheme = darkColorScheme(
+    // Primary colors
+    primary = KonCallColors.Teal,
+    onPrimary = KonCallColors.TextPrimary,
+    primaryContainer = KonCallColors.TealAlpha20,
+    onPrimaryContainer = KonCallColors.Teal,
+    
+    // Secondary colors (Violet accent)
+    secondary = KonCallColors.Violet,
+    onSecondary = KonCallColors.TextPrimary,
+    secondaryContainer = KonCallColors.VioletAlpha20,
+    onSecondaryContainer = KonCallColors.Violet,
+    
+    // Tertiary colors
+    tertiary = KonCallColors.Success,
+    onTertiary = KonCallColors.TextPrimary,
+    tertiaryContainer = KonCallColors.SuccessAlpha10,
+    onTertiaryContainer = KonCallColors.Success,
+    
+    // Error colors
+    error = KonCallColors.Error,
+    onError = KonCallColors.TextPrimary,
+    errorContainer = KonCallColors.ErrorAlpha10,
+    onErrorContainer = KonCallColors.Error,
+    
+    // Background colors
+    background = KonCallColors.BackgroundDeep,
+    onBackground = KonCallColors.TextPrimary,
+    
+    // Surface colors
+    surface = KonCallColors.SurfaceDefault,
+    onSurface = KonCallColors.TextPrimary,
+    surfaceVariant = KonCallColors.SurfaceVariant,
+    onSurfaceVariant = KonCallColors.TextSecondary,
+    
+    // Other
+    outline = KonCallColors.TextTertiary,
+    outlineVariant = KonCallColors.TextMuted,
+    inverseSurface = KonCallColors.TextPrimary,
+    inverseOnSurface = KonCallColors.BackgroundDeep,
+    inversePrimary = KonCallColors.TealDark,
+    surfaceTint = KonCallColors.Teal
 )
 
 @Composable
 fun KonCallTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean = true, // Always dark for premium look
+    dynamicColor: Boolean = false, // Disabled for consistent branding
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val colorScheme = KonCallDarkColorScheme
+    
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = KonCallColors.BackgroundDeep.toArgb()
+            window.navigationBarColor = KonCallColors.BackgroundDeep.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = false
         }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
     }
 
     MaterialTheme(
