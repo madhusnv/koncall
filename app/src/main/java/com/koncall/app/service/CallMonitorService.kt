@@ -12,6 +12,10 @@ import android.os.Looper
 import android.provider.CallLog
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.koncall.app.R
 import com.koncall.app.data.local.dao.CallLogDao
 import com.koncall.app.data.local.dao.LeadDao
@@ -238,6 +242,10 @@ class CallMonitorService : Service() {
                 }
                 
                 callLogDao.insertCallLogs(callsToInsert)
+                Log.d(TAG, "Inserted ${callsToInsert.size} call logs, triggering sync...")
+                
+                // Trigger immediate sync to backend
+                triggerImmediateSync()
                 
             } catch (e: Exception) {
                 Log.e(TAG, "Error syncing call logs", e)
@@ -245,5 +253,21 @@ class CallMonitorService : Service() {
                 stopSelf()
             }
         }
+    }
+    
+    /**
+     * Trigger immediate sync to backend using WorkManager
+     */
+    private fun triggerImmediateSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        
+        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .build()
+        
+        WorkManager.getInstance(this).enqueue(syncRequest)
+        Log.d(TAG, "Immediate sync enqueued")
     }
 }
