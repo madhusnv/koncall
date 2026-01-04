@@ -119,6 +119,10 @@ defmodule KoncallApiWeb.Admin.LeadLive.Index do
         <header class="top-header">
           <div class="flex-1"></div>
           <div class="flex items-center gap-3">
+            <a href="/admin/exports/leads" class="btn btn-ghost">
+              <.icon name="hero-arrow-down-tray" class="w-5 h-5" />
+              Export CSV
+            </a>
             <a href="/admin/leads/import" class="btn btn-ghost">
               <.icon name="hero-arrow-up-tray" class="w-5 h-5" />
               Import CSV
