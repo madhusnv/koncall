@@ -21,9 +21,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    // TODO: Change to your actual server URL
-    private const val BASE_URL = "http://192.168.1.19:4000/"  // Local Wi-Fi IP
-
     @Provides
     @Singleton
     fun provideTokenManager(@ApplicationContext context: Context): TokenManager {
@@ -59,7 +56,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

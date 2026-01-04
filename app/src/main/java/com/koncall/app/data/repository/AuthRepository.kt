@@ -2,6 +2,7 @@ package com.koncall.app.data.repository
 
 import com.koncall.app.data.remote.api.KonCallApiService
 import com.koncall.app.data.remote.dto.*
+import com.koncall.app.util.ApiErrorParser
 import com.koncall.app.util.TokenManager
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,7 +36,7 @@ class AuthRepository @Inject constructor(
                 
                 Result.success(data.user)
             } else {
-                Result.failure(Exception("Login failed: ${response.code()}"))
+                Result.failure(ApiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -73,7 +74,7 @@ class AuthRepository @Inject constructor(
                 
                 Result.success(data.user)
             } else {
-                Result.failure(Exception("Registration failed: ${response.code()}"))
+                Result.failure(ApiErrorParser.parseError(response))
             }
         } catch (e: Exception) {
             Result.failure(e)
