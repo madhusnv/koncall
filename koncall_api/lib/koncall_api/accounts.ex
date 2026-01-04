@@ -5,6 +5,7 @@ defmodule KoncallApi.Accounts do
   import Ecto.Query, warn: false
   alias KoncallApi.Repo
   alias KoncallApi.Accounts.{Organization, User, Device}
+  alias KoncallApi.Universities
 
   # =====================
   # Organizations
@@ -80,11 +81,25 @@ defmodule KoncallApi.Accounts do
     |> Repo.all()
   end
 
+  @doc "List counsellors for a branch"
+  def list_branch_counsellors(branch_id) do
+    User
+    |> where([u], u.branch_id == ^branch_id and u.role == "counsellor" and u.is_active == true)
+    |> order_by([u], asc: u.name)
+    |> Repo.all()
+  end
+
+  @doc "List counsellors for a university"
+  def list_university_counsellors(university_id) do
+    Universities.get_university_counsellors(university_id)
+  end
+
   @doc "Create a user with password"
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+    |> handle_university_assignment(attrs)
   end
 
   @doc "Update a user"
@@ -92,7 +107,20 @@ defmodule KoncallApi.Accounts do
     user
     |> User.changeset(attrs)
     |> Repo.update()
+    |> handle_university_assignment(attrs)
   end
+
+  defp handle_university_assignment({:ok, user} = result, attrs) do
+    # Handle both string (params) and atom (code) keys
+    ids = attrs["university_ids"] || attrs[:university_ids]
+    
+    if ids do
+      Universities.set_counsellor_universities(user.id, ids)
+    end
+    
+    result
+  end
+  defp handle_university_assignment(result, _), do: result
 
   @doc "Update user password"
   def update_user_password(%User{} = user, attrs) do

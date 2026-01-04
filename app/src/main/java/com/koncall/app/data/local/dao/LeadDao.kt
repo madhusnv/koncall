@@ -19,6 +19,12 @@ interface LeadDao {
     @Query("SELECT * FROM leads WHERE phoneNumber = :phoneNumber OR alternatePhone = :phoneNumber LIMIT 1")
     suspend fun getLeadByPhoneNumber(phoneNumber: String): LeadEntity?
     
+    @Query("SELECT * FROM leads WHERE " +
+           "SUBSTR(REPLACE(REPLACE(REPLACE(phoneNumber, ' ', ''), '-', ''), '+', ''), -10) = :last10Digits " +
+           "OR SUBSTR(REPLACE(REPLACE(REPLACE(alternatePhone, ' ', ''), '-', ''), '+', ''), -10) = :last10Digits " +
+           "LIMIT 1")
+    suspend fun getLeadByNormalizedPhone(last10Digits: String): LeadEntity?
+    
     @Query("SELECT * FROM leads WHERE syncStatus = :status")
     suspend fun getLeadsBySyncStatus(status: String): List<LeadEntity>
     

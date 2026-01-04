@@ -9,9 +9,32 @@ defmodule KoncallApiWeb.Api.LeadController do
   action_fallback KoncallApiWeb.FallbackController
 
   def index(conn, params) do
-    org_id = Guardian.Plug.current_claims(conn)["org_id"]
-    leads = CRM.list_leads(org_id, params)
+    user = get_current_user(conn)
+    
+    leads = 
+      case user.role do
+        "admin" -> 
+          CRM.list_leads(user.organization_id, params)
+          
+        "branch_manager" ->
+          # Managers see leads in their branch
+          CRM.list_branch_leads(user.branch_id, params)
+          
+        "counsellor" ->
+          # Counsellors only see leads assigned to them
+          CRM.list_counsellor_leads(user.id, params)
+          
+        _ -> []
+      end
+
     render(conn, :index, leads: leads)
+  end
+
+  defp get_current_user(conn) do
+    case Guardian.Plug.current_resource(conn) do
+      %Accounts.User{} = user -> user
+      %Accounts.Device{} = device -> Accounts.get_user!(device.user_id)
+    end
   end
 
   def create(conn, params) do

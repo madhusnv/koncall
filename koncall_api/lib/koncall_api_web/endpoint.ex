@@ -29,7 +29,7 @@ defmodule KoncallApiWeb.Endpoint do
     at: "/",
     from: :koncall_api,
     gzip: not code_reloading?,
-    only: ~w(assets fonts images favicon.ico robots.txt uploads),
+    only: ~w(assets fonts images favicon.ico robots.txt uploads sw.js),
     raise_on_missing_only: code_reloading?
 
   # Code reloading can be explicitly enabled under the

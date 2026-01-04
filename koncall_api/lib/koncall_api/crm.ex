@@ -5,6 +5,7 @@ defmodule KoncallApi.CRM do
   import Ecto.Query, warn: false
   alias KoncallApi.Repo
   alias KoncallApi.CRM.{Lead, LeadStatus}
+  alias KoncallApi.Accounts
 
   # =====================
   # Leads
@@ -49,7 +50,7 @@ defmodule KoncallApi.CRM do
     |> filter_by_search(params["search"])
     |> filter_by_reminder(params["due_leads"])
     |> order_by([l], desc: l.inserted_at)
-    |> preload([:status, :university])
+    |> preload([:status, :university, :assigned_to_user])
     |> paginate(params)
   end
 
@@ -137,27 +138,74 @@ defmodule KoncallApi.CRM do
   end
 
   @doc "Bulk import leads from CSV data"
-  def import_leads(org_id, branch_id, leads_data, default_attrs \\ %{}) when is_list(leads_data) do
+  def import_leads(org_id, branch_id, leads_data, opts \\ []) when is_list(leads_data) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
     
-    results = Enum.map(leads_data, fn data ->
-      attrs = Map.merge(default_attrs, %{
-        "organization_id" => org_id,
-        "branch_id" => branch_id,
-        "student_name" => data["student_name"] || data["name"],
-        "phone_number" => data["phone_number"] || data["phone"],
-        "stage" => "new",
-        "inserted_at" => now,
-        "updated_at" => now
-      })
+    distribution_strategy = Keyword.get(opts, :distribution_strategy, :none)
+    counsellors_cycle = get_distribution_cycle(branch_id, opts)
+    
+    results = 
+      leads_data
+      |> Enum.with_index()
+      |> Enum.map(fn {data, index} ->
+        assigned_to = get_assigned_counsellor(counsellors_cycle, index)
+        
+        raw_name = data["student_name"] || data["name"]
+        student_name = if raw_name in [nil, ""], do: "Unknown", else: raw_name
+        
+        attrs = %{
+          "organization_id" => org_id,
+          "branch_id" => branch_id,
+          "student_name" => student_name,
+          "first_name" => student_name, # Fallback to satisfy DB constraint if first_name is NOT NULL
+          "phone_number" => data["phone_number"] || data["phone"],
+          "stage" => "new",
+          "assigned_to" => assigned_to,
+          "inserted_at" => now,
+          "updated_at" => now
+        }
+        
+        IO.inspect(attrs, label: "Import Lead Attrs") # Debug log
 
-      create_lead(attrs)
-    end)
+        create_lead(attrs)
+      end)
 
     success = Enum.filter(results, &match?({:ok, _}, &1)) |> length()
     failed = Enum.filter(results, &match?({:error, _}, &1)) |> length()
 
     {:ok, %{success: success, failed: failed}}
+  end
+
+  defp get_distribution_cycle(_branch_id, opts) do
+    strategy = Keyword.get(opts, :distribution_strategy, :none)
+    
+    counsellors = case strategy do
+      :branch_rr ->
+        Accounts.list_branch_counsellors(opts[:branch_id]) # Note: branch_id passed to func might be needed here, or use opts
+      :university_rr ->
+        Accounts.list_university_counsellors(opts[:university_id])
+      :manual ->
+        # opts[:target_ids] contains list of user_ids
+        # We need to turn them into simple functional cycle, but we need IDs.
+        # Actually cycle just needs to return ID.
+        opts[:target_ids] || []
+      _ ->
+        []
+    end
+
+    # Handle struct list vs id list
+    ids = Enum.map(counsellors, fn
+      %Accounts.User{id: id} -> id
+      id when is_binary(id) -> id
+      _ -> nil
+    end) |> Enum.reject(&is_nil/1)
+
+    if ids != [], do: ids, else: nil
+  end
+
+  defp get_assigned_counsellor(nil, _index), do: nil
+  defp get_assigned_counsellor(ids, index) do
+    Enum.at(ids, rem(index, length(ids)))
   end
 
   @doc "Get lead stage statistics for a scope"

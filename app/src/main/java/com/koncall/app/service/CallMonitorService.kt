@@ -65,6 +65,19 @@ class CallMonitorService : Service() {
         const val ACTION_STOP_FOREGROUND = "com.koncall.app.STOP_FOREGROUND"
         const val ACTION_START_RECORDING = "com.koncall.app.START_RECORDING"
         const val ACTION_STOP_RECORDING = "com.koncall.app.STOP_RECORDING"
+        
+        /**
+         * Normalize phone number for matching.
+         * Removes country code (+91), spaces, dashes, and keeps last 10 digits.
+         */
+        fun normalizePhoneNumber(phone: String): String {
+            val digitsOnly = phone.filter { it.isDigit() }
+            return if (digitsOnly.length >= 10) {
+                digitsOnly.takeLast(10)
+            } else {
+                digitsOnly
+            }
+        }
     }
 
     override fun onCreate() {
@@ -188,14 +201,18 @@ class CallMonitorService : Service() {
                     val notExists = callLogDao.getCallLogByDeviceId(call.deviceCallId) == null
                     if (!notExists) return@filter false
                     
-                    // Only sync calls that match a known lead
+                    // Normalize phone number for matching (handle +91, spaces, dashes)
+                    val normalizedNumber = normalizePhoneNumber(call.phoneNumber)
+                    
+                    // Try exact match first, then normalized match
                     val lead = leadDao.getLeadByPhoneNumber(call.phoneNumber)
+                        ?: leadDao.getLeadByNormalizedPhone(normalizedNumber)
                     val isLead = lead != null
                     
                     if (isLead) {
-                        Log.d(TAG, "Syncing call for lead: ${call.phoneNumber}")
+                        Log.d(TAG, "Syncing call for lead: ${call.phoneNumber} (${call.callType})")
                     } else {
-                        Log.d(TAG, "Ignored unknown number: ${call.phoneNumber}")
+                        Log.d(TAG, "Skipped non-lead call: ${call.phoneNumber}")
                     }
                     
                     isLead

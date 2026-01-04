@@ -2,6 +2,7 @@ defmodule KoncallApiWeb.Admin.UserLive.FormComponent do
   use KoncallApiWeb, :live_component
 
   alias KoncallApi.Accounts
+  alias KoncallApi.Universities
 
   @impl true
   def render(assigns) do
@@ -55,6 +56,18 @@ defmodule KoncallApiWeb.Admin.UserLive.FormComponent do
           </div>
         </div>
 
+        <%= if @form[:role].value == "counsellor" do %>
+          <div>
+            <label class="label">Assigned Universities</label>
+            <p class="text-xs mb-2" style="color: var(--color-text-muted);">Hold Ctrl/Cmd to select multiple</p>
+            <select name="user[university_ids][]" multiple class="input h-32" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+              <%= for uni <- @universities do %>
+                <option value={uni.id} selected={uni.id in (@form[:university_ids].value || @assigned_ids)}><%= uni.name %></option>
+              <% end %>
+            </select>
+          </div>
+        <% end %>
+
         <div class="flex justify-end gap-3 pt-6 mt-8 border-t-2" style="border-color: var(--color-border-light);">
           <.link patch={@patch} class="btn btn-ghost">Cancel</.link>
           <button type="submit" phx-disable-with="Saving..." class="btn btn-primary">
@@ -70,9 +83,15 @@ defmodule KoncallApiWeb.Admin.UserLive.FormComponent do
   @impl true
   def update(%{user: user} = assigns, socket) do
     changeset = Accounts.User.changeset(user, %{})
+    # Use current_user.organization_id for scoping universities
+    universities = Universities.list_active_universities(assigns.current_user.organization_id)
+    assigned_ids = if user.id, do: Universities.get_counsellor_universities(user.id) |> Enum.map(& &1.id), else: []
+
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:universities, universities)
+     |> assign(:assigned_ids, assigned_ids)
      |> assign_form(changeset)}
   end
 
