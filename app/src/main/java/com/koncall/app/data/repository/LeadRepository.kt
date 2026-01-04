@@ -104,6 +104,20 @@ class LeadRepository @Inject constructor(
         }
     }
     
+    /**
+     * Set or clear a follow-up reminder for a lead (local only for now)
+     */
+    suspend fun setReminder(leadId: String, reminderAt: Long?) {
+        leadDao.updateReminder(leadId, reminderAt)
+    }
+    
+    /**
+     * Get count of leads with pending (due) reminders
+     */
+    suspend fun getPendingRemindersCount(): Int {
+        return leadDao.getPendingRemindersCount()
+    }
+    
     private fun LeadDto.toEntity(): LeadEntity {
         return LeadEntity(
             id = id,

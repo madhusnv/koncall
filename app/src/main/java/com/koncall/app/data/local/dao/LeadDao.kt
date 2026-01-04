@@ -43,9 +43,15 @@ interface LeadDao {
     @Query("UPDATE leads SET stage = :stage, updatedAt = :updatedAt WHERE id = :leadId")
     suspend fun updateLeadStage(leadId: String, stage: String, updatedAt: Long = System.currentTimeMillis())
     
+    @Query("UPDATE leads SET reminderAt = :reminderAt, updatedAt = :updatedAt WHERE id = :leadId")
+    suspend fun updateReminder(leadId: String, reminderAt: Long?, updatedAt: Long = System.currentTimeMillis())
+    
     @Delete
     suspend fun deleteLead(lead: LeadEntity)
     
     @Query("DELETE FROM leads")
     suspend fun deleteAll()
+    
+    @Query("SELECT COUNT(*) FROM leads WHERE reminderAt IS NOT NULL AND reminderAt <= :currentTime")
+    suspend fun getPendingRemindersCount(currentTime: Long = System.currentTimeMillis()): Int
 }

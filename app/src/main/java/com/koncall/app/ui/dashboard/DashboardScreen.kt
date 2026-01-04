@@ -159,8 +159,14 @@ fun DashboardScreen(
                     accentColor = KonCallColors.Error,
                     onClick = onNavigateToNotPickedUp
                 )
-                // Empty spacer for alignment
-                Spacer(modifier = Modifier.weight(1f))
+                StatCard(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Default.Notifications,
+                    title = "Follow-ups",
+                    value = uiState.stats.pendingFollowUps.toString(),
+                    accentColor = KonCallColors.Violet,
+                    onClick = onNavigateToLeads
+                )
             }
             
             // Pending Sync Banner

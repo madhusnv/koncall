@@ -45,6 +45,8 @@ fun LeadsScreen(
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
     var selectedStage by remember { mutableStateOf<String?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedDateFilter by remember { mutableStateOf<DateFilter>(DateFilter.ALL) }
     
     // File picker for CSV import
     val csvPickerLauncher = rememberLauncherForActivityResult(
@@ -55,13 +57,33 @@ fun LeadsScreen(
         }
     }
     
-    // Filter leads by stage
-    val filteredLeads = remember(uiState.leads, selectedStage) {
-        if (selectedStage == null) {
-            uiState.leads
-        } else {
-            uiState.leads.filter { it.stage == selectedStage }
-        }
+    // Filter leads by stage, search query, and date
+    val filteredLeads = remember(uiState.leads, selectedStage, searchQuery, selectedDateFilter) {
+        uiState.leads
+            .filter { lead ->
+                // Stage filter
+                selectedStage == null || lead.stage == selectedStage
+            }
+            .filter { lead ->
+                // Search filter
+                if (searchQuery.isBlank()) true
+                else {
+                    lead.displayName.contains(searchQuery, ignoreCase = true) ||
+                    lead.phoneNumber.contains(searchQuery) ||
+                    (lead.email?.contains(searchQuery, ignoreCase = true) ?: false)
+                }
+            }
+            .filter { lead ->
+                // Date filter
+                val now = System.currentTimeMillis()
+                val dayStart = now - (now % (24 * 60 * 60 * 1000))
+                when (selectedDateFilter) {
+                    DateFilter.TODAY -> lead.updatedAt >= dayStart
+                    DateFilter.THIS_WEEK -> lead.updatedAt >= now - (7 * 24 * 60 * 60 * 1000)
+                    DateFilter.THIS_MONTH -> lead.updatedAt >= now - (30L * 24 * 60 * 60 * 1000)
+                    DateFilter.ALL -> true
+                }
+            }
     }
     
     // Import result dialog
@@ -203,6 +225,41 @@ fun LeadsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                placeholder = { Text("Search by name, phone, email...", color = KonCallColors.TextTertiary) },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null, tint = KonCallColors.TextSecondary)
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = "Clear", tint = KonCallColors.TextSecondary)
+                        }
+                    }
+                },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = KonCallColors.Teal,
+                    unfocusedBorderColor = KonCallColors.SurfaceElevated,
+                    focusedTextColor = KonCallColors.TextPrimary,
+                    unfocusedTextColor = KonCallColors.TextPrimary,
+                    cursorColor = KonCallColors.Teal
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+            
+            // Date Filter Chips
+            DateFilterChips(
+                selectedFilter = selectedDateFilter,
+                onFilterSelected = { selectedDateFilter = it }
+            )
+            
             // Stage filter chips
             StageFilterChips(
                 selectedStage = selectedStage,
@@ -405,6 +462,7 @@ fun LeadDetailScreen(
     val context = LocalContext.current
     val lead by viewModel.getLeadById(leadId).collectAsState(initial = null)
     var showStageDialog by remember { mutableStateOf(false) }
+    var showReminderDialog by remember { mutableStateOf(false) }
     
     // Permission launcher for CALL_PHONE
     val callPermissionLauncher = rememberLauncherForActivityResult(
@@ -468,6 +526,67 @@ fun LeadDetailScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showStageDialog = false }) {
+                    Text("Cancel", color = KonCallColors.TextSecondary)
+                }
+            },
+            containerColor = KonCallColors.SurfaceCard
+        )
+    }
+    
+    // Reminder Dialog
+    if (showReminderDialog && lead != null) {
+        AlertDialog(
+            onDismissRequest = { showReminderDialog = false },
+            title = { Text("Set Follow-up Reminder", color = KonCallColors.TextPrimary) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("When would you like to follow up?", color = KonCallColors.TextSecondary)
+                    
+                    // Quick selection buttons
+                    val now = System.currentTimeMillis()
+                    val dayMs = 24 * 60 * 60 * 1000L
+                    
+                    listOf(
+                        "Later Today (4 hours)" to (now + 4 * 60 * 60 * 1000),
+                        "Tomorrow" to (now + dayMs),
+                        "In 3 Days" to (now + 3 * dayMs),
+                        "Next Week" to (now + 7 * dayMs)
+                    ).forEach { (label, time) ->
+                        OutlinedButton(
+                            onClick = {
+                                viewModel.setReminder(lead!!.id, time)
+                                showReminderDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = KonCallColors.Teal
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder.copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(KonCallColors.Teal.copy(alpha = 0.5f))
+                            )
+                        ) {
+                            Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(label)
+                        }
+                    }
+                    
+                    // Clear reminder if one exists
+                    if (lead!!.reminderAt != null) {
+                        TextButton(
+                            onClick = {
+                                viewModel.clearReminder(lead!!.id)
+                                showReminderDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Clear Reminder", color = KonCallColors.Error)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showReminderDialog = false }) {
                     Text("Cancel", color = KonCallColors.TextSecondary)
                 }
             },
@@ -599,6 +718,39 @@ fun LeadDetailScreen(
                             Icon(Icons.Default.Phone, contentDescription = null, tint = Color.White)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Call Lead", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        
+                        // Set Reminder Button
+                        OutlinedButton(
+                            onClick = { showReminderDialog = true },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = KonCallColors.Violet
+                            ),
+                            border = ButtonDefaults.outlinedButtonBorder.copy(
+                                brush = androidx.compose.ui.graphics.SolidColor(KonCallColors.Violet)
+                            )
+                        ) {
+                            Icon(Icons.Default.Notifications, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                if (lead!!.reminderAt != null) "Reminder Set" else "Set Reminder",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        // Show reminder time if set
+                        if (lead!!.reminderAt != null) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            val reminderDate = java.text.SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", java.util.Locale.getDefault())
+                                .format(java.util.Date(lead!!.reminderAt!!))
+                            Text(
+                                "Follow-up: $reminderDate",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = KonCallColors.Violet
+                            )
                         }
                     }
                 }
@@ -781,5 +933,44 @@ fun getStageColor(stage: String): Color {
         LeadStage.ENROLLED -> KonCallColors.StageEnrolled
         LeadStage.JOINED -> KonCallColors.StageJoined
         else -> KonCallColors.TextSecondary
+    }
+}
+
+// Date filter enum
+enum class DateFilter(val label: String) {
+    ALL("All"),
+    TODAY("Today"),
+    THIS_WEEK("This Week"),
+    THIS_MONTH("This Month")
+}
+
+@Composable
+private fun DateFilterChips(
+    selectedFilter: DateFilter,
+    onFilterSelected: (DateFilter) -> Unit
+) {
+    LazyRow(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(DateFilter.entries.toList()) { filter ->
+            FilterChip(
+                selected = selectedFilter == filter,
+                onClick = { onFilterSelected(filter) },
+                label = { Text(filter.label) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = KonCallColors.Violet,
+                    selectedLabelColor = Color.White,
+                    containerColor = KonCallColors.SurfaceCard,
+                    labelColor = KonCallColors.TextSecondary
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selectedFilter == filter,
+                    borderColor = Color.Transparent,
+                    selectedBorderColor = Color.Transparent
+                )
+            )
+        }
     }
 }

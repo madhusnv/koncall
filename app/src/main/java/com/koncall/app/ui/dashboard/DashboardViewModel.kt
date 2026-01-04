@@ -24,7 +24,8 @@ data class DashboardStats(
     val missedCalls: Int = 0,
     val neverAttendedCount: Int = 0,
     val notPickedUpCount: Int = 0,
-    val pendingSyncCount: Int = 0
+    val pendingSyncCount: Int = 0,
+    val pendingFollowUps: Int = 0  // Leads with due reminders
 )
 
 data class DashboardUiState(
@@ -62,6 +63,7 @@ class DashboardViewModel @Inject constructor(
                 val neverAttended = callLogRepository.getNeverAttendedNumbers()
                 val notPickedUp = callLogRepository.getNotPickedUpNumbers()
                 val pending = callLogRepository.getPendingCallLogs()
+                val pendingFollowUps = leadRepository.getPendingRemindersCount()
                 
                 _uiState.value = DashboardUiState(
                     isLoading = false,
@@ -73,7 +75,8 @@ class DashboardViewModel @Inject constructor(
                         missedCalls = missedCalls,
                         neverAttendedCount = neverAttended.size,
                         notPickedUpCount = notPickedUp.size,
-                        pendingSyncCount = pending.size
+                        pendingSyncCount = pending.size,
+                        pendingFollowUps = pendingFollowUps
                     )
                 )
             } catch (e: Exception) {

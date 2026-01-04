@@ -125,6 +125,24 @@ class LeadsViewModel @Inject constructor(
             leadRepository.updateLeadStage(leadId, newStage)
         }
     }
+    
+    /**
+     * Set a follow-up reminder for a lead
+     */
+    fun setReminder(leadId: String, reminderAt: Long) {
+        viewModelScope.launch {
+            leadRepository.setReminder(leadId, reminderAt)
+        }
+    }
+    
+    /**
+     * Clear the follow-up reminder for a lead
+     */
+    fun clearReminder(leadId: String) {
+        viewModelScope.launch {
+            leadRepository.setReminder(leadId, null)
+        }
+    }
 
     /**
      * Import leads from a CSV file
