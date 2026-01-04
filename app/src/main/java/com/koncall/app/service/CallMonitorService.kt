@@ -25,6 +25,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 
@@ -110,6 +113,10 @@ class CallMonitorService : Service() {
             }
             ACTION_STOP_RECORDING -> {
                 lastRecordingFile = callRecorder?.stopRecording()
+                // Upload recording to server
+                lastRecordingFile?.let { file ->
+                    uploadRecordingToServer(file)
+                }
                 syncRecentCallLogs()
             }
             else -> syncRecentCallLogs()
@@ -269,5 +276,30 @@ class CallMonitorService : Service() {
         
         WorkManager.getInstance(this).enqueue(syncRequest)
         Log.d(TAG, "Immediate sync enqueued")
+    }
+    
+    /**
+     * Upload recording file to server
+     */
+    private fun uploadRecordingToServer(file: File) {
+        serviceScope.launch {
+            try {
+                Log.d(TAG, "Uploading recording: ${file.name}")
+                
+                val requestBody = file.asRequestBody("audio/aac".toMediaTypeOrNull())
+                val filePart = MultipartBody.Part.createFormData("file", file.name, requestBody)
+                
+                val response = apiService.uploadRecording(filePart)
+                
+                if (response.isSuccessful) {
+                    val uploadResponse = response.body()
+                    Log.d(TAG, "Recording uploaded successfully: ${uploadResponse?.url}")
+                } else {
+                    Log.e(TAG, "Failed to upload recording: ${response.code()} ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error uploading recording", e)
+            }
+        }
     }
 }

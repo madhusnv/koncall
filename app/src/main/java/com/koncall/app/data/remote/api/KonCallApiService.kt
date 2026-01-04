@@ -42,8 +42,8 @@ interface KonCallApiService {
     suspend fun getCallLog(@Path("id") id: String): Response<CallLogResponse>
     
     @Multipart
-    @POST("api/call-logs/upload-recording")
-    suspend fun uploadRecording(@Part recording: okhttp3.MultipartBody.Part): Response<UploadResponse>
+    @POST("api/recordings/upload")
+    suspend fun uploadRecording(@Part file: okhttp3.MultipartBody.Part): Response<UploadResponse>
     
     // ==================
     // Leads

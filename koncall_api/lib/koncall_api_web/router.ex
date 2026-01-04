@@ -157,6 +157,9 @@ defmodule KoncallApiWeb.Router do
     # Settings
     get "/settings", SettingsController, :show
     put "/settings", SettingsController, :update
+    
+    # Recording uploads
+    post "/recordings/upload", RecordingController, :upload
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
