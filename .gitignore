@@ -1,0 +1,146 @@
+# ===========================================
+# KonCall Mono-repo .gitignore
+# Android + Phoenix/Elixir
+# ===========================================
+
+# ===========================================
+# ANDROID / KOTLIN
+# ===========================================
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Compiled files
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# Local configuration file
+local.properties
+
+# Keystore files
+*.jks
+*.keystore
+!debug.keystore
+
+# Proguard folder
+proguard/
+
+# Android Studio Navigation Editor temp files
+.navigation/
+
+# Android Studio captures folder
+captures/
+
+# Kotlin
+.kotlin/
+
+# Crash logs
+crash_log*.txt
+
+# ===========================================
+# PHOENIX / ELIXIR (koncall_api/)
+# ===========================================
+
+# Mix build artifacts
+koncall_api/_build/
+koncall_api/deps/
+koncall_api/cover/
+koncall_api/doc/
+koncall_api/.fetch
+koncall_api/*.ez
+koncall_api/tmp/
+koncall_api/koncall_api-*.tar
+
+# Compiled assets
+koncall_api/priv/static/assets/
+koncall_api/priv/static/cache_manifest.json
+
+# Node modules
+koncall_api/assets/node_modules/
+npm-debug.log
+
+# Elixir LS
+koncall_api/.elixir_ls/
+koncall_api/.lexical/
+
+# PLT files (Dialyzer)
+koncall_api/priv/plts/
+koncall_api/*.plt
+koncall_api/*.plt.hash
+
+# Release artifacts
+koncall_api/rel/builds/
+koncall_api/rel/releases/
+
+# Uploads
+koncall_api/priv/static/uploads/
+
+# ===========================================
+# SHARED / COMMON
+# ===========================================
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.envrc
+**/config/*.secret.exs
+
+# VM crash dumps
+erl_crash.dump
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+
+# Docker overrides
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+koncall_api/test/support/fixtures/
+
+# Gemini AI artifacts
+.gemini/
+
+# Other projects in same folder (not part of this repo)
+admission_system/
