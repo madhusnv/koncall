@@ -29,10 +29,10 @@ interface CallLogDao {
     @Query("SELECT * FROM call_logs WHERE callType = :type ORDER BY callDateTime DESC")
     fun getCallLogsByType(type: String): Flow<List<CallLogEntity>>
     
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCallLog(callLog: CallLogEntity): Long
     
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCallLogs(callLogs: List<CallLogEntity>)
     
     @Update

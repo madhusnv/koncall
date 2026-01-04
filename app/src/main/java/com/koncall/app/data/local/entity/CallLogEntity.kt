@@ -10,7 +10,8 @@ import androidx.room.PrimaryKey
         Index(value = ["phoneNumber"]),
         Index(value = ["callDateTime"]),
         Index(value = ["syncStatus"]),
-        Index(value = ["appInitiated"])
+        Index(value = ["appInitiated"]),
+        Index(value = ["deviceCallId"], unique = true)
     ]
 )
 data class CallLogEntity(

@@ -15,7 +15,7 @@ import com.koncall.app.data.local.entity.LeadEntity
         CallNoteEntity::class,
         LeadEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class KonCallDatabase : RoomDatabase() {
