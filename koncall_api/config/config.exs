@@ -69,8 +69,15 @@ config :koncall_api, KoncallApi.Guardian,
 # Oban background job configuration
 config :koncall_api, Oban,
   repo: KoncallApi.Repo,
-  plugins: [Oban.Plugins.Pruner],
-  queues: [default: 10, sync: 5, recordings: 3]
+  plugins: [
+    Oban.Plugins.Pruner,
+    {Oban.Plugins.Cron,
+     crontab: [
+       # Check for due reminders every minute
+       {"* * * * *", KoncallApi.Workers.ReminderWorker}
+     ]}
+  ],
+  queues: [default: 10, sync: 5, recordings: 3, reminders: 2]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -141,6 +141,29 @@ defmodule KoncallApiWeb.Api.LeadController do
     render(conn, :users, users: users)
   end
 
+  @doc """
+  Set or clear a follow-up reminder for a lead.
+  PUT /api/leads/:id/reminder
+  Body: { "reminder_at": "2024-01-15T10:00:00Z" } or { "reminder_at": null }
+  """
+  def set_reminder(conn, %{"id" => id} = params) do
+    lead = CRM.get_lead!(id)
+    
+    reminder_at = case params["reminder_at"] do
+      nil -> nil
+      "" -> nil
+      datetime_string -> 
+        case DateTime.from_iso8601(datetime_string) do
+          {:ok, dt, _offset} -> DateTime.truncate(dt, :second)
+          _ -> nil
+        end
+    end
+    
+    with {:ok, updated} <- CRM.update_lead(lead, %{"reminder_at" => reminder_at}) do
+      render(conn, :show, lead: updated)
+    end
+  end
+
   # Private helpers
 
   defp get_csv_content(%{"file" => %Plug.Upload{path: path}}) do

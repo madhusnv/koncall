@@ -80,6 +80,9 @@ defmodule KoncallApiWeb.Router do
     live "/leads", LeadLive.Index, :index
     live "/leads/import", LeadLive.Import, :import
     live "/leads/:id", LeadLive.Show, :show
+    
+    # Analytics Dashboard
+    live "/analytics", AnalyticsLive, :index
 
     # Reports
     live "/reports", ReportLive.Index, :index
@@ -87,6 +90,10 @@ defmodule KoncallApiWeb.Router do
     live "/reports/counsellors/:id", ReportLive.CounsellorShow, :show
     live "/reports/branches", ReportLive.Branches, :index
     live "/reports/universities", ReportLive.Universities, :index
+    
+    # CSV Exports (regular controller, not LiveView)
+    get "/exports/leads", ExportController, :leads
+    get "/exports/call-logs", ExportController, :call_logs
   end
 
   # Public API routes - no auth required
@@ -125,6 +132,7 @@ defmodule KoncallApiWeb.Router do
     get "/leads/by-phone/:phone", LeadController, :by_phone
     post "/leads/import", LeadController, :import_csv
     put "/leads/:id/stage", LeadController, :update_stage
+    put "/leads/:id/reminder", LeadController, :set_reminder
     get "/users", LeadController, :list_users
 
     # Lead statuses
