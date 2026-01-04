@@ -4,14 +4,16 @@ defmodule KoncallApiWeb.Admin.AnalyticsLive do
   """
   use KoncallApiWeb, :live_view
   alias KoncallApi.Analytics.Team, as: TeamAnalytics
+  alias KoncallApi.Accounts
 
   @impl true
   def mount(_params, session, socket) do
-    user = get_user_from_session(session)
+    user_id = session["admin_user_id"]
+    user = Accounts.get_user!(user_id, [:organization])
     
     {:ok, socket
      |> assign(:current_user, user)
-     |> assign(:page_title, "Analytics Dashboard")
+     |> assign(:page_title, "Analytics")
      |> assign(:date_filter, "all")
      |> load_analytics()}
   end
@@ -48,196 +50,6 @@ defmodule KoncallApiWeb.Admin.AnalyticsLive do
     {:noreply, socket |> assign(:date_filter, period) |> load_analytics()}
   end
 
-  defp get_user_from_session(session) do
-    case session["admin_user_id"] do
-      nil -> nil
-      user_id -> KoncallApi.Accounts.get_user(user_id)
-    end
-  end
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <Layouts.app flash={@flash} current_scope={%{current_user: @current_user}}>
-      <div class="space-y-6">
-        <div class="flex justify-between items-center">
-          <h1 class="text-2xl font-bold text-zinc-100">Analytics Dashboard</h1>
-          
-          <div class="flex gap-2">
-            <button 
-              phx-click="filter" phx-value-period="today"
-              class={["px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      if(@date_filter == "today", do: "bg-indigo-600 text-white", else: "bg-zinc-800 text-zinc-300 hover:bg-zinc-700")]}>
-              Today
-            </button>
-            <button 
-              phx-click="filter" phx-value-period="week"
-              class={["px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      if(@date_filter == "week", do: "bg-indigo-600 text-white", else: "bg-zinc-800 text-zinc-300 hover:bg-zinc-700")]}>
-              This Week
-            </button>
-            <button 
-              phx-click="filter" phx-value-period="month"
-              class={["px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      if(@date_filter == "month", do: "bg-indigo-600 text-white", else: "bg-zinc-800 text-zinc-300 hover:bg-zinc-700")]}>
-              This Month
-            </button>
-            <button 
-              phx-click="filter" phx-value-period="all"
-              class={["px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      if(@date_filter == "all", do: "bg-indigo-600 text-white", else: "bg-zinc-800 text-zinc-300 hover:bg-zinc-700")]}>
-              All Time
-            </button>
-          </div>
-        </div>
-
-        <%!-- Summary Cards --%>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <.stat_card title="Total Calls" value={@org_summary.total_calls} icon="hero-phone" color="indigo" />
-          <.stat_card title="Connected" value={@org_summary.connected_calls} icon="hero-check-circle" color="emerald" />
-          <.stat_card title="Total Duration" value={format_duration(@org_summary.total_duration)} icon="hero-clock" color="amber" />
-          <.stat_card title="Active Callers" value={@org_summary.unique_callers} icon="hero-users" color="pink" />
-        </div>
-
-        <%!-- Quick Stats Row --%>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800">
-            <div class="text-zinc-400 text-sm">Calls Today</div>
-            <div class="text-2xl font-bold text-zinc-100"><%= @org_summary.calls_today %></div>
-          </div>
-          <div class="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800">
-            <div class="text-zinc-400 text-sm">Calls This Week</div>
-            <div class="text-2xl font-bold text-zinc-100"><%= @org_summary.calls_this_week %></div>
-          </div>
-          <div class="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800">
-            <div class="text-zinc-400 text-sm">Calls This Month</div>
-            <div class="text-2xl font-bold text-zinc-100"><%= @org_summary.calls_this_month %></div>
-          </div>
-        </div>
-
-        <%!-- Leaderboard & Stage Summary --%>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <%!-- Team Leaderboard --%>
-          <div class="bg-zinc-900/50 rounded-xl border border-zinc-800">
-            <div class="p-4 border-b border-zinc-800">
-              <h2 class="text-lg font-semibold text-zinc-100 flex items-center gap-2">
-                <.icon name="hero-trophy" class="w-5 h-5 text-amber-400" />
-                Team Leaderboard
-              </h2>
-            </div>
-            <div class="p-4">
-              <%= if @leaderboard == [] do %>
-                <p class="text-zinc-500 text-center py-8">No call data yet</p>
-              <% else %>
-                <div class="space-y-3">
-                  <%= for entry <- @leaderboard do %>
-                    <div class="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg">
-                      <div class="flex items-center gap-3">
-                        <span class={["w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm",
-                                     rank_color(entry.rank)]}>
-                          <%= entry.rank %>
-                        </span>
-                        <div>
-                          <div class="font-medium text-zinc-100"><%= entry.user_name %></div>
-                          <div class="text-xs text-zinc-500"><%= entry.user_email %></div>
-                        </div>
-                      </div>
-                      <div class="text-right">
-                        <div class="font-bold text-zinc-100"><%= entry.total_calls %> calls</div>
-                        <div class="text-xs text-zinc-500"><%= entry.connected_calls %> connected</div>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-          </div>
-
-          <%!-- Lead Stage Funnel --%>
-          <div class="bg-zinc-900/50 rounded-xl border border-zinc-800">
-            <div class="p-4 border-b border-zinc-800">
-              <h2 class="text-lg font-semibold text-zinc-100 flex items-center gap-2">
-                <.icon name="hero-funnel" class="w-5 h-5 text-indigo-400" />
-                Lead Stages
-              </h2>
-            </div>
-            <div class="p-4">
-              <div class="space-y-3">
-                <%= for {stage, color} <- stage_colors() do %>
-                  <% count = Map.get(@stage_summary, stage, 0) %>
-                  <div class="flex items-center justify-between">
-                    <span class="capitalize text-zinc-300"><%= String.replace(stage, "_", " ") %></span>
-                    <div class="flex items-center gap-2">
-                      <div class="w-32 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                        <div class={"h-full rounded-full " <> color} style={"width: #{stage_percent(@stage_summary, stage)}%"}></div>
-                      </div>
-                      <span class="text-zinc-100 font-medium w-8 text-right"><%= count %></span>
-                    </div>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <%!-- Peak Hours Chart placeholder --%>
-        <div class="bg-zinc-900/50 rounded-xl border border-zinc-800 p-4">
-          <h2 class="text-lg font-semibold text-zinc-100 mb-4 flex items-center gap-2">
-            <.icon name="hero-chart-bar" class="w-5 h-5 text-emerald-400" />
-            Peak Calling Hours
-          </h2>
-          <div class="flex items-end gap-1 h-32">
-            <%= for hour <- 0..23 do %>
-              <% count = Enum.find(@hourly_data, %{call_count: 0}, & &1.hour == hour).call_count %>
-              <% max_count = Enum.max_by(@hourly_data, & &1.call_count, fn -> %{call_count: 1} end).call_count %>
-              <% height = if max_count > 0, do: count / max_count * 100, else: 0 %>
-              <div 
-                class="flex-1 bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t transition-all hover:from-indigo-500"
-                style={"height: #{max(height, 2)}%"}
-                title={"#{hour}:00 - #{count} calls"}>
-              </div>
-            <% end %>
-          </div>
-          <div class="flex justify-between text-xs text-zinc-500 mt-2">
-            <span>12 AM</span>
-            <span>6 AM</span>
-            <span>12 PM</span>
-            <span>6 PM</span>
-            <span>12 AM</span>
-          </div>
-        </div>
-      </div>
-    </Layouts.app>
-    """
-  end
-
-  defp stat_card(assigns) do
-    ~H"""
-    <div class="bg-zinc-900/50 rounded-xl p-4 border border-zinc-800">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="text-zinc-400 text-sm"><%= @title %></div>
-          <div class="text-2xl font-bold text-zinc-100"><%= @value %></div>
-        </div>
-        <div class={["p-3 rounded-lg", color_class(@color)]}>
-          <.icon name={@icon} class="w-6 h-6" />
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  defp color_class("indigo"), do: "bg-indigo-600/20 text-indigo-400"
-  defp color_class("emerald"), do: "bg-emerald-600/20 text-emerald-400"
-  defp color_class("amber"), do: "bg-amber-600/20 text-amber-400"
-  defp color_class("pink"), do: "bg-pink-600/20 text-pink-400"
-  defp color_class(_), do: "bg-zinc-600/20 text-zinc-400"
-
-  defp rank_color(1), do: "bg-amber-500 text-white"
-  defp rank_color(2), do: "bg-zinc-400 text-white"
-  defp rank_color(3), do: "bg-amber-700 text-white"
-  defp rank_color(_), do: "bg-zinc-700 text-zinc-300"
-
   defp format_duration(nil), do: "0m"
   defp format_duration(seconds) when is_integer(seconds) do
     hours = div(seconds, 3600)
@@ -251,21 +63,297 @@ defmodule KoncallApiWeb.Admin.AnalyticsLive do
   end
   defp format_duration(_), do: "0m"
 
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="app-layout">
+      <%!-- Sidebar Navigation --%>
+      <aside id="sidebar" class="sidebar">
+        <%!-- Collapse Toggle Button --%>
+        <button 
+          type="button" 
+          class="sidebar-collapse-toggle"
+          phx-click={JS.toggle_class("collapsed", to: "#sidebar")}
+          title="Toggle sidebar"
+        >
+          <.icon name="hero-chevron-left" class="w-4 h-4" />
+        </button>
+        
+        <div class="sidebar-header">
+          <a href="/admin/dashboard" class="sidebar-logo">
+            <div class="sidebar-logo-icon">
+              <.icon name="hero-phone" class="w-7 h-7 text-white" />
+            </div>
+            <div class="flex flex-col">
+              <span class="sidebar-logo-title">KonCall CRM</span>
+              <span class="sidebar-logo-subtitle">Education Consultancy</span>
+            </div>
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="sidebar-nav-item">
+            <.icon name="hero-home" class="sidebar-nav-icon" />
+            <span>Dashboard</span>
+          </a>
+          <%= if @current_user.role == "admin" do %>
+            <a href="/admin/branches" class="sidebar-nav-item">
+              <.icon name="hero-building-office" class="sidebar-nav-icon" />
+              <span>Branches</span>
+            </a>
+            <a href="/admin/universities" class="sidebar-nav-item">
+              <.icon name="hero-academic-cap" class="sidebar-nav-icon" />
+              <span>Universities</span>
+            </a>
+            <a href="/admin/users" class="sidebar-nav-item">
+              <.icon name="hero-users" class="sidebar-nav-icon" />
+              <span>Users</span>
+            </a>
+          <% end %>
+          <a href="/admin/leads" class="sidebar-nav-item">
+            <.icon name="hero-user-group" class="sidebar-nav-icon" />
+            <span>Leads</span>
+          </a>
+          <a href="/admin/analytics" class="sidebar-nav-item active">
+            <.icon name="hero-chart-bar" class="sidebar-nav-icon" />
+            <span>Analytics</span>
+          </a>
+          <a href="/admin/reports" class="sidebar-nav-item">
+            <.icon name="hero-document-chart-bar" class="sidebar-nav-icon" />
+            <span>Reports</span>
+          </a>
+        </nav>
+
+        <div class="p-4 border-t-2 border-[var(--color-border-light)]">
+          <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--color-bg-secondary);">
+            <.icon name="hero-user-circle-solid" class="w-10 h-10 text-[var(--color-primary)]" />
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-sm truncate" style="color: var(--color-text-primary);"><%= @current_user.name %></div>
+              <div class="text-xs capitalize" style="color: var(--color-text-muted);"><%= @current_user.role %></div>
+            </div>
+          </div>
+          <a href="/admin/logout" class="sidebar-nav-item mt-2" style="color: var(--color-error);">
+            <.icon name="hero-arrow-right-on-rectangle" class="sidebar-nav-icon" />
+            <span>Log out</span>
+          </a>
+        </div>
+      </aside>
+
+      <%!-- Mobile Overlay --%>
+      <div id="sidebar-overlay" class="sidebar-overlay" phx-click={JS.remove_class("open", to: "#sidebar") |> JS.remove_class("active", to: "#sidebar-overlay")}></div>
+
+      <%!-- Main Content Area --%>
+      <div class="main-content">
+        <header class="top-header">
+          <button 
+            type="button"
+            class="mobile-menu-toggle"
+            phx-click={JS.add_class("open", to: "#sidebar") |> JS.add_class("active", to: "#sidebar-overlay")}
+          >
+            <.icon name="hero-bars-3" class="w-6 h-6" style="color: var(--color-text-primary);" />
+          </button>
+          <div class="flex-1"></div>
+          
+          <%!-- Date Filter Buttons --%>
+          <div class="flex gap-2">
+            <button phx-click="filter" phx-value-period="today"
+                    class={"btn text-sm " <> if(@date_filter == "today", do: "btn-primary", else: "btn-ghost")}>
+              Today
+            </button>
+            <button phx-click="filter" phx-value-period="week"
+                    class={"btn text-sm " <> if(@date_filter == "week", do: "btn-primary", else: "btn-ghost")}>
+              This Week
+            </button>
+            <button phx-click="filter" phx-value-period="month"
+                    class={"btn text-sm " <> if(@date_filter == "month", do: "btn-primary", else: "btn-ghost")}>
+              This Month
+            </button>
+            <button phx-click="filter" phx-value-period="all"
+                    class={"btn text-sm " <> if(@date_filter == "all", do: "btn-primary", else: "btn-ghost")}>
+              All Time
+            </button>
+          </div>
+        </header>
+
+        <main class="main-content-inner">
+          <%!-- Page Header --%>
+          <div class="page-header">
+            <div class="page-header-content">
+              <div class="page-header-icon">
+                <.icon name="hero-chart-bar" class="w-8 h-8 text-[var(--color-primary)]" />
+              </div>
+              <div>
+                <h1 class="page-header-title">Analytics Dashboard</h1>
+                <p class="page-header-subtitle">Team performance, call statistics, and insights</p>
+              </div>
+            </div>
+          </div>
+
+          <%!-- Summary Stats --%>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-stagger">
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-phone" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= @org_summary.total_calls %></div>
+              <div class="stat-card-label">Total Calls</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-check-circle" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= @org_summary.connected_calls %></div>
+              <div class="stat-card-label">Connected</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-clock" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= format_duration(@org_summary.total_duration) %></div>
+              <div class="stat-card-label">Total Duration</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-users" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= @org_summary.unique_callers %></div>
+              <div class="stat-card-label">Active Callers</div>
+            </div>
+          </div>
+
+          <%!-- Quick Stats Row --%>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 animate-stagger">
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-sun" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= @org_summary.calls_today %></div>
+              <div class="stat-card-label">Calls Today</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-calendar" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= @org_summary.calls_this_week %></div>
+              <div class="stat-card-label">Calls This Week</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon">
+                <.icon name="hero-calendar-days" class="w-5 h-5" />
+              </div>
+              <div class="stat-card-value"><%= @org_summary.calls_this_month %></div>
+              <div class="stat-card-label">Calls This Month</div>
+            </div>
+          </div>
+
+          <%!-- Leaderboard & Stage Summary --%>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <%!-- Team Leaderboard --%>
+            <div class="card">
+              <h3 class="text-xl font-display font-bold mb-6 flex items-center gap-2" style="color: var(--color-text-primary);">
+                <.icon name="hero-trophy" class="w-6 h-6 text-amber-500" />
+                Team Leaderboard
+              </h3>
+              <%= if @leaderboard == [] do %>
+                <div class="text-center py-8" style="color: var(--color-text-muted);">
+                  <.icon name="hero-chart-bar" class="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>No call data available yet</p>
+                </div>
+              <% else %>
+                <div class="space-y-3">
+                  <%= for entry <- @leaderboard do %>
+                    <div class="flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:scale-[1.02]" 
+                         style="border-color: var(--color-border); background: var(--color-bg-secondary);">
+                      <div class="flex items-center gap-3">
+                        <span class={"w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg " <> rank_class(entry.rank)}>
+                          <%= entry.rank %>
+                        </span>
+                        <div>
+                          <div class="font-semibold" style="color: var(--color-text-primary);"><%= entry.user_name %></div>
+                          <div class="text-xs" style="color: var(--color-text-muted);"><%= entry.user_email %></div>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-display font-bold text-lg" style="color: var(--color-primary);"><%= entry.total_calls %> <span class="text-sm font-normal">calls</span></div>
+                        <div class="text-xs" style="color: var(--color-text-muted);"><%= entry.connected_calls %> connected</div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <%!-- Lead Stage Funnel --%>
+            <div class="card">
+              <h3 class="text-xl font-display font-bold mb-6 flex items-center gap-2" style="color: var(--color-text-primary);">
+                <.icon name="hero-funnel" class="w-6 h-6 text-[var(--color-primary)]" />
+                Lead Stages
+              </h3>
+              <div class="space-y-4">
+                <%= for {stage, color} <- stage_colors() do %>
+                  <% count = Map.get(@stage_summary, stage, 0) %>
+                  <% max_count = max(Enum.max(Map.values(@stage_summary), fn -> 1 end), 1) %>
+                  <% width = count / max_count * 100 %>
+                  <div class="flex items-center gap-4">
+                    <span class="w-24 text-sm font-medium capitalize" style="color: var(--color-text-secondary);">
+                      <%= String.replace(stage, "_", " ") %>
+                    </span>
+                    <div class="flex-1 h-3 rounded-full overflow-hidden" style="background: var(--color-bg-tertiary);">
+                      <div class={"h-full rounded-full transition-all " <> color} style={"width: #{max(width, 3)}%"}></div>
+                    </div>
+                    <span class="w-8 text-right font-bold" style="color: var(--color-text-primary);"><%= count %></span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <%!-- Peak Hours Chart --%>
+          <div class="card">
+            <h3 class="text-xl font-display font-bold mb-6 flex items-center gap-2" style="color: var(--color-text-primary);">
+              <.icon name="hero-clock" class="w-6 h-6 text-emerald-500" />
+              Peak Calling Hours
+            </h3>
+            <div class="flex items-end gap-1 h-40 px-4">
+              <%= for hour <- 0..23 do %>
+                <% count = Enum.find(@hourly_data, %{call_count: 0}, & &1.hour == hour).call_count %>
+                <% max_count = max(Enum.max_by(@hourly_data, & &1.call_count, fn -> %{call_count: 1} end).call_count, 1) %>
+                <% height = count / max_count * 100 %>
+                <div 
+                  class="flex-1 rounded-t-md transition-all hover:opacity-80"
+                  style={"height: #{max(height, 5)}%; background: linear-gradient(to top, var(--color-primary), var(--color-secondary));"}
+                  title={"#{hour}:00 - #{count} calls"}>
+                </div>
+              <% end %>
+            </div>
+            <div class="flex justify-between text-xs mt-4 px-4" style="color: var(--color-text-muted);">
+              <span>12 AM</span>
+              <span>6 AM</span>
+              <span>12 PM</span>
+              <span>6 PM</span>
+              <span>11 PM</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    """
+  end
+
+  defp rank_class(1), do: "bg-amber-500 text-white"
+  defp rank_class(2), do: "bg-zinc-400 text-white"
+  defp rank_class(3), do: "bg-amber-700 text-white"
+  defp rank_class(_), do: "bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]"
+
   defp stage_colors do
     [
-      {"new", "bg-indigo-500"},
+      {"new", "bg-blue-500"},
       {"contacted", "bg-emerald-500"},
       {"interested", "bg-amber-500"},
       {"application_submitted", "bg-pink-500"},
       {"documents_collected", "bg-purple-500"},
       {"enrolled", "bg-cyan-500"},
-      {"joined", "bg-green-500"}
+      {"joined", "bg-green-600"}
     ]
-  end
-
-  defp stage_percent(summary, stage) do
-    total = Map.values(summary) |> Enum.sum()
-    count = Map.get(summary, stage, 0)
-    if total > 0, do: count / total * 100, else: 0
   end
 end
