@@ -20,4 +20,5 @@ sealed class Screen(val route: String) {
     object NeverAttended : Screen("analytics/never_attended")
     object NotPickedUp : Screen("analytics/not_picked_up")
     object Settings : Screen("settings")
+    object RecordingSettings : Screen("settings/recording")
 }

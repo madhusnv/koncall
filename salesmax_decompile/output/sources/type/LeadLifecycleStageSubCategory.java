@@ -1,0 +1,14 @@
+package type;
+
+/* loaded from: classes7.dex */
+public enum LeadLifecycleStageSubCategory {
+    PROSPECTING_NO_OUTCOME,
+    PROSPECTING_OUTCOME,
+    CLOSED_NEGATIVE_OUTCOME,
+    CLOSED_PROSPECTING_ATTEMPTS_DONE,
+    CLOSED_PROSPECTING_TIME_OVER,
+    OPPORTUNITY_WON,
+    OPPORTUNITY_LOST,
+    CLOSED_INACTIVE,
+    CLOSED_MANUAL
+}

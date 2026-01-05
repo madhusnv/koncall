@@ -68,24 +68,12 @@ class PhoneStateReceiver : BroadcastReceiver() {
                     callStartTime = System.currentTimeMillis()
                 }
                 Log.d(TAG, "Call connected")
-
-                // Start Recording
-                val recordIntent = Intent(context, CallMonitorService::class.java).apply {
-                    action = CallMonitorService.ACTION_START_RECORDING
-                    if (incomingNumber != null) {
-                         putExtra("phoneNumber", incomingNumber)
-                    }
-                }
-                context.startService(recordIntent)
+                // Recording is handled by OEM dialer, no action needed here
             }
             TelephonyManager.CALL_STATE_IDLE -> {
                 // Call ended
-
-                // Stop Recording
-                val stopRecordIntent = Intent(context, CallMonitorService::class.java).apply {
-                    action = CallMonitorService.ACTION_STOP_RECORDING
-                }
-                context.startService(stopRecordIntent)
+                val callEndTime = System.currentTimeMillis()
+                val duration = ((callEndTime - callStartTime) / 1000).toInt()
 
                 // Complete app-initiated call tracking if there was a pending call
                 if (::appCallTracker.isInitialized && appCallTracker.isCallActive.value) {
@@ -100,10 +88,9 @@ class PhoneStateReceiver : BroadcastReceiver() {
                         triggerCallLogSync(context)
                     }
                     TelephonyManager.CALL_STATE_OFFHOOK -> {
-                        // Call ended normally
-                        val duration = ((System.currentTimeMillis() - callStartTime) / 1000).toInt()
+                        // Call ended normally - notify service to find recording
                         Log.d(TAG, "Call ended. Duration: ${duration}s, isOutgoing: $isOutgoing")
-                        triggerCallLogSync(context)
+                        notifyCallEnded(context, callEndTime, incomingNumber, duration)
                     }
                 }
                 
@@ -122,6 +109,20 @@ class PhoneStateReceiver : BroadcastReceiver() {
             }
         }
         lastState = state
+    }
+    
+    /**
+     * Notify CallMonitorService that a call ended.
+     * The service will schedule the RecordingFinderWorker to discover OEM recordings.
+     */
+    private fun notifyCallEnded(context: Context, callEndTime: Long, phoneNumber: String?, duration: Int) {
+        val intent = Intent(context, CallMonitorService::class.java).apply {
+            action = CallMonitorService.ACTION_CALL_ENDED
+            putExtra(CallMonitorService.EXTRA_CALL_END_TIME, callEndTime)
+            putExtra(CallMonitorService.EXTRA_PHONE_NUMBER, phoneNumber)
+            putExtra(CallMonitorService.EXTRA_CALL_DURATION, duration)
+        }
+        context.startService(intent)
     }
 
     private fun triggerCallLogSync(context: Context) {

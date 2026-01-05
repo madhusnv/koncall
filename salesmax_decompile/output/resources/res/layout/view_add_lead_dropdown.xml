@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/view_add_lead_dropdown_0"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.Guideline
+        android:orientation="vertical"
+        android:id="@+id/viewAddLeadGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.45"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Body2"
+        android:textColor="?attr/colorOnSurface"
+        android:id="@+id/viewAddLeadTitle"
+        android:paddingTop="@dimen/grid_1_5"
+        android:paddingBottom="@dimen/grid_1_5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="First name"
+        android:layout_marginStart="@dimen/grid_1_5"
+        app:layout_constraintEnd_toEndOf="@+id/viewAddLeadGuideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <com.google.android.material.textfield.TextInputLayout
+        android:textAppearance="@style/TextAppearance.Superfone.Body2"
+        android:id="@+id/viewAddLeadValueLayout"
+        android:background="@android:color/transparent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:inputType="text"
+        android:imeOptions="actionNext"
+        android:layout_marginEnd="@dimen/grid_1_5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/viewAddLeadGuideline"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Superfone.Input.DropDown">
+        <ai.salesmax.view.AllAutoCompleteTextView
+            android:textAppearance="@style/TextAppearance.Superfone.Body2"
+            android:textColor="?attr/colorOnSurface"
+            android:id="@+id/viewAddLeadValue"
+            android:tag="binding_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            style="@style/Superfone.Input.DropDownTextView"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <View
+        android:id="@+id/viewAddLeadBorder1"
+        android:background="@drawable/ic_bottom_border"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

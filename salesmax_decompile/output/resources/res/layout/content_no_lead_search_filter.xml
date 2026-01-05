@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/content_no_lead_search_filter_0"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/page_logo"
+        android:background="@color/superfone_grey_100"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/page_title"
+        app:layout_constraintDimensionRatio="V, 1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintWidth_percent="0.6"
+        app:shapeAppearance="@style/ShapeAppearance.Superfone.RoundedImageView"
+        app:srcCompat="@drawable/ic_leads_placeholder"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Headline4"
+        android:id="@+id/page_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1_5"
+        android:text="@string/no_lead_search"
+        app:layout_constraintBottom_toTopOf="@+id/page_subTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/page_logo"
+        app:layout_constraintVertical_chainStyle="packed"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Body1"
+        android:textColor="?attr/colorOnSurface"
+        android:gravity="center"
+        android:id="@+id/page_subTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1"
+        android:text="@string/no_lead_search_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/page_title"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/clearFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_2"
+        android:text="Clear All"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/page_subTitle"
+        style="@style/Superfone.Button"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

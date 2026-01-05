@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/ic_home"
+        android:enabled="true"
+        android:id="@+id/home"
+        android:title="@string/home"/>
+    <item
+        android:icon="@drawable/ic_leads"
+        android:enabled="true"
+        android:id="@+id/leads"
+        android:title="@string/leads"/>
+    <item
+        android:icon="@drawable/ic_message_text"
+        android:enabled="true"
+        android:id="@+id/chat"
+        android:title="Chat"/>
+    <item
+        android:icon="@drawable/ic_tasks"
+        android:enabled="true"
+        android:id="@+id/todo"
+        android:title="@string/to_do"/>
+    <item
+        android:icon="@drawable/ic_activity"
+        android:enabled="true"
+        android:id="@+id/activity"
+        android:title="@string/activity"/>
+</menu>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:tag="layout/sheet_search_location_0"
+    android:visibility="visible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:behavior_hideable="true"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+    <com.google.android.material.card.MaterialCardView
+        android:tag="binding_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Superfone.BottomSheetCard">
+        <include
+            android:id="@+id/searchRootView"
+            layout="@layout/add_task_search_location"/>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

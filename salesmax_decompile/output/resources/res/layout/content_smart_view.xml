@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/content_smart_view_0"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Headline5"
+        android:id="@+id/homeTodoTitle"
+        android:tag="binding_1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1_5"
+        android:layout_marginBottom="@dimen/grid_1_5"
+        android:text="Smart Views"
+        android:layout_marginStart="@dimen/grid_2"
+        android:layout_marginEnd="@dimen/grid_1_5"
+        app:layout_constraintEnd_toStartOf="@+id/homeTodoViewAll"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
+    <com.google.android.material.button.MaterialButton
+        android:textAppearance="@style/TextAppearance.Superfone.Subtitle1Bold"
+        android:textColor="?attr/colorPrimary"
+        android:id="@+id/homeTodoViewAll"
+        android:tag="binding_2"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/view_all"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        style="@style/Widget.Superfone.TextButtonNoPadding"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:orientation="vertical"
+        android:id="@+id/homeTodoList"
+        android:tag="binding_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/grid_1_5"
+        android:nestedScrollingEnabled="false"
+        app:layoutManager="ai.salesmax.view.WrapContentLinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homeTodoTitle"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

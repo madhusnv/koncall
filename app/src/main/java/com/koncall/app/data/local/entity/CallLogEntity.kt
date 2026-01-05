@@ -1,5 +1,6 @@
 package com.koncall.app.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -33,10 +34,17 @@ data class CallLogEntity(
     val syncStatus: String = SyncStatus.PENDING,
     val serverId: String? = null,
     
-    // Recording info
+    // Recording info (enhanced for Recording Finder)
     val hasNote: Boolean = false,
     val hasRecording: Boolean = false,
-    val recordingPath: String? = null,
+    val recordingPath: String? = null,          // Local file path (legacy)
+    val recordingUri: String? = null,           // Content URI from MediaStore/SAF
+    val recordingFileName: String? = null,      // Original filename
+    val recordingMimeType: String? = null,      // audio/mpeg, audio/aac, etc.
+    val recordingSize: Long? = null,            // File size in bytes
+    @ColumnInfo(defaultValue = "none")
+    val recordingSyncStatus: String = RecordingSyncStatus.NONE,
+    val recordingServerUrl: String? = null,     // URL after upload to backend
     
     // Lead connection
     val leadId: String? = null,
@@ -57,4 +65,12 @@ object CallType {
     const val OUTGOING = "outgoing"
     const val MISSED = "missed"
     const val REJECTED = "rejected"
+}
+
+object RecordingSyncStatus {
+    const val NONE = "none"           // No recording found
+    const val PENDING = "pending"     // Recording found, awaiting upload
+    const val UPLOADING = "uploading" // Currently uploading
+    const val UPLOADED = "uploaded"   // Successfully uploaded
+    const val FAILED = "failed"       // Upload failed
 }

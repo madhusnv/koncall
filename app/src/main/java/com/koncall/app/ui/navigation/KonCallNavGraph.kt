@@ -26,6 +26,7 @@ import com.koncall.app.ui.leads.LeadsScreen
 import com.koncall.app.ui.leads.LeadsViewModel
 import com.koncall.app.ui.settings.SettingsScreen
 import com.koncall.app.ui.settings.SettingsViewModel
+import com.koncall.app.ui.settings.recording.RecordingSettingsScreen
 import javax.inject.Inject
 
 @Composable
@@ -175,6 +176,13 @@ fun KonCallNavGraph(
                         popUpTo(0) { inclusive = true }
                     }
                 },
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToRecordingSettings = { navController.navigate(Screen.RecordingSettings.route) }
+            )
+        }
+        
+        composable(Screen.RecordingSettings.route) {
+            RecordingSettingsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

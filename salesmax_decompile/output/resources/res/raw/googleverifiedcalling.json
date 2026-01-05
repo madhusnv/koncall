@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "superfone-verified-calling",
+  "private_key_id": "63faa94ec646739c3347a06ea2e8d75589d1e438",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCQJHzghkMu9/p0\n2dzcyBXy6vTqJbUQfS1DeWJcegGyUl3QMVNjPJmJfOTCkbFUcEBJIe2ZtNy/iyxc\n5xnp1Tuvps8gIgpiZ+HezBKJxOzeGA5nCvKuhN/ghzJ4HOoFlf82BXy9RQQN7nhC\n17kBiziYbkDkAdGuPYxlP8MsHnRRtTiSAw3UmTMw+XnkNJIcpox6S2+XcASysjAS\nAcS1uCbR8BbAS08RUDAGk/X8C/RZJKia+pXM9TZxblK0VL18XO+HKHmXTWNPH103\nkBWOzO55A+cGl1a4XesuMgrs0p8uRI22ncSTvzyfeTcyX0dAnXrk+rirV/+kq/M8\nnxomSwaTAgMBAAECggEAAL9vtmp75r56miiXML4I/x2g76YKbm930KXMkNZBM/+h\nZPcci6NA2KnBNhEzblC2xKpcZTO/AW9jZ4f7Zm8oxByFbpE+pIwNa+57GiPfZreR\nO4+e+rDNyIhrBpx/yk+g51LX9tNo1fmqvg4Ic62ZOZE43PX1dIX1OIFALfZqfBIG\nnhPfjlzY1tnvxq6qlxGT7UsDVUt23LuSVN6EMf89AzZyYkBQq6l1OVAJAfkLHOKz\nSXzdc1npwAJowRMh7MNjV6OkTHGORsV40e7falYmMiPjLsxu8v06ahILqMUAelXA\n/aM4ZcpE/kpg3q7iP8+9k9ZA9WCyIP8ZzBXV6pOmIQKBgQDK/Yp2cIBd3DocXrdW\nQs6dtYdHmXj1hIm/NJ4mdRS24tawQQZrAVy78seAps+4HLEvUaCXn2YarCEjof1z\nplIx0fEn7ZWsm9InS+MximYZD5hxsqNZXv09nEdKMuDnkkFEexuCF/XWXzjRCSD1\nF7RvkauoQz3utk5H0GwQW3t7DQKBgQC1yM6z0zqQSZ9E9hjjNBHpmGNO6cnDvOPf\n99tJiVjjjB44y4r5KXRK1p2I50R0AdzBbWDQ1rJrpA1cov2wUIkn2h9FjTcr6bPr\nEw9De7G6FoiUb1kS3cMCbW331I1jx4JJsM8If81TwjsB+T2eb7HJYn6nRboPqCtg\nvcshk2ugHwKBgHe9decF2AMF/NVtXdKpl/3Z7hHjS0Hwy9yZak0fNXfoeWIBCYsn\ng49u2BZg0Bk3+6EBEq0+HtnO/cFqNfr5enTe9dVqxabLR/1cO4mmrTFNTMyM5uS6\nLsIgJMF1H8waLxv5TrG/9oldJEPSkbliIVLK6Cpad/cPXT/ph0Vi4YUlAoGAKXIV\nHo7ERW1jsLdjSTnv85BY4/8Nj2Ebm07JYmS8LXUe1tghYVmAOCfiVvpTcxeRm1Ay\nyKqKl1wZ58sJiA90le93PcZKk+p+qNP5oOssxD6q+RzB9Dk3YvBMKDr/2YX9QIvd\nSBTLXZNlHLgUwnC42i9orP6Kw1MWQMJE8+zGlwUCgYEAnJxfTEUJKowxsr6zab3b\nF+/V+2kcPKAm7gTFEUnaJBiNvBx9qH29z+TPz8HOb06rSHzAcKpUwQpu5VnaOHNE\n01aJkhCTKRUx1jTGRzk8Nn6EZUMvuhFUdiGd3zqALHeVYL+s4Wz/pfBf7C7vB6D2\nunRq7jBoPFq5VxRrA6+Ga3c=\n-----END PRIVATE KEY-----\n",
+  "client_email": "superfone-call-police@superfone-verified-calling.iam.gserviceaccount.com",
+  "client_id": "115833459102819047501",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/superfone-call-police%40superfone-verified-calling.iam.gserviceaccount.com"
+}

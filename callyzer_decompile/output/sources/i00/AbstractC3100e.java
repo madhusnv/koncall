@@ -1,0 +1,13 @@
+package i00;
+
+import a9.C0073l;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+
+/* compiled from: r8-map-id-9a0e3898ebce267aa93fdb2b9ae0dadacb352c01d7a13c4da957b245de4f18d9 */
+/* renamed from: i00.e */
+/* loaded from: classes3.dex */
+public abstract class AbstractC3100e {
+    /* renamed from: a */
+    public abstract InterfaceC3101f mo7444a(Type type, Annotation[] annotationArr, C0073l c0073l);
+}

@@ -27,7 +27,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.19:4000/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.0.112:4000/\"")
         }
         release {
             isMinifyEnabled = false
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     
     // Navigation
     implementation(libs.navigation.compose)
@@ -96,6 +97,9 @@ dependencies {
     
     // DataStore
     implementation(libs.datastore.preferences)
+    
+    // DocumentFile for SAF support
+    implementation(libs.documentfile)
     
     // Testing
     testImplementation(libs.junit)

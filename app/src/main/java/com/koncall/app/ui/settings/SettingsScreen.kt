@@ -24,7 +24,8 @@ import com.koncall.app.ui.theme.KonCallColors
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     onLogout: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToRecordingSettings: () -> Unit = {}
 ) {
     val isLoggingOut by viewModel.isLoggingOut.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
@@ -101,6 +102,16 @@ fun SettingsScreen(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = KonCallColors.SurfaceCard)
             ) {
+                SettingItem(
+                    title = "Recording Settings",
+                    subtitle = "Configure call recording sync",
+                    icon = Icons.Default.Mic,
+                    iconColor = KonCallColors.Teal,
+                    onClick = onNavigateToRecordingSettings
+                )
+                
+                HorizontalDivider(color = KonCallColors.BackgroundDeep.copy(alpha = 0.5f))
+                
                 SettingItem(
                     title = "Sync Settings",
                     subtitle = "Configure auto-sync behavior",

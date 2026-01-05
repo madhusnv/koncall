@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/all_files_fragment_0"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerLayout"
+        android:animationCache="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header_title"
+        app:shimmer_repeat_mode="restart"
+        app:shimmer_shape="radial">
+        <LinearLayout
+            android:orientation="vertical"
+            android:tag="binding_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:orientation="horizontal"
+        android:id="@+id/rvTemplateTypeList"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
+        app:layoutManager="ai.salesmax.view.WrapContentLinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:spanCount="1"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Headline5"
+        android:textColor="?attr/colorOnSurface"
+        android:id="@+id/header_title"
+        android:paddingTop="@dimen/grid_0_5"
+        android:paddingBottom="@dimen/grid_0_5"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/grid_1_5"
+        android:layout_marginStart="@dimen/grid_0_5"
+        android:layout_marginEnd="@dimen/grid_0_5"
+        app:layout_constraintBottom_toTopOf="@+id/rvTemplatesList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvTemplateTypeList"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:orientation="vertical"
+        android:id="@+id/rvTemplatesList"
+        android:scrollbars="vertical"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:nestedScrollingEnabled="true"
+        app:layoutManager="ai.salesmax.view.WrapContentLinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header_title"
+        app:spanCount="1"/>
+    <include
+        android:id="@+id/contentNoItems"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        layout="@layout/content_no_template"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

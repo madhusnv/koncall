@@ -13,22 +13,23 @@ import android.provider.CallLog
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.koncall.app.R
 import com.koncall.app.data.local.dao.CallLogDao
 import com.koncall.app.data.local.dao.LeadDao
 import com.koncall.app.data.remote.api.KonCallApiService
+import com.koncall.app.service.recording.RecordingFinderWorker
+import com.koncall.app.service.recording.RecordingUploadWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -37,11 +38,11 @@ import javax.inject.Inject
  * Responsibilities:
  * - Running as foreground service to monitor calls
  * - Registering/unregistering call log observer
- * - Coordinating call log sync and recording
+ * - Coordinating call log sync and recording discovery
  * 
  * Logic delegated to:
  * - CallLogReader: Reading system call logs
- * - CallRecorder: Recording calls
+ * - RecordingFinderWorker: Finding OEM recordings after calls
  * - CallLogObserver: Observing call log changes
  */
 @AndroidEntryPoint
@@ -58,8 +59,6 @@ class CallMonitorService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var callLogObserver: CallLogObserver? = null
-    private var callRecorder: CallRecorder? = null
-    private var lastRecordingFile: File? = null
 
     companion object {
         private const val TAG = "CallMonitorService"
@@ -70,8 +69,16 @@ class CallMonitorService : Service() {
         const val ACTION_SYNC_CALL_LOGS = "com.koncall.app.SYNC_CALL_LOGS"
         const val ACTION_START_FOREGROUND = "com.koncall.app.START_FOREGROUND"
         const val ACTION_STOP_FOREGROUND = "com.koncall.app.STOP_FOREGROUND"
-        const val ACTION_START_RECORDING = "com.koncall.app.START_RECORDING"
-        const val ACTION_STOP_RECORDING = "com.koncall.app.STOP_RECORDING"
+        const val ACTION_CALL_ENDED = "com.koncall.app.CALL_ENDED"
+        const val ACTION_SCAN_RECORDINGS = "com.koncall.app.SCAN_RECORDINGS"
+        
+        // Intent extras
+        const val EXTRA_CALL_END_TIME = "callEndTime"
+        const val EXTRA_PHONE_NUMBER = "phoneNumber"
+        const val EXTRA_CALL_DURATION = "callDuration"
+        
+        // Recording finder delay (wait for OEM dialer to save)
+        private const val RECORDING_FINDER_DELAY_SECONDS = 30L
         
         /**
          * Normalize phone number for matching.
@@ -90,7 +97,6 @@ class CallMonitorService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
-        callRecorder = CallRecorder(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -107,18 +113,25 @@ class CallMonitorService : Service() {
             ACTION_SYNC_CALL_LOGS -> syncRecentCallLogs()
             ACTION_START_FOREGROUND -> startForegroundMode()
             ACTION_STOP_FOREGROUND -> stopForegroundMode()
-            ACTION_START_RECORDING -> {
-                val phoneNumber = intent.getStringExtra("phoneNumber")
-                callRecorder?.startRecording(phoneNumber)
-            }
-            ACTION_STOP_RECORDING -> {
-                lastRecordingFile = callRecorder?.stopRecording()
-                // Upload recording to server
-                lastRecordingFile?.let { file ->
-                    uploadRecordingToServer(file)
+            
+            ACTION_CALL_ENDED -> {
+                // Call ended - schedule recording finder after delay
+                val callEndTime = intent.getLongExtra(EXTRA_CALL_END_TIME, System.currentTimeMillis())
+                val phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER)
+                val duration = intent.getIntExtra(EXTRA_CALL_DURATION, 0)
+                
+                // Only look for recordings on calls with duration > 0
+                if (duration > 0) {
+                    scheduleRecordingFinder(callEndTime, phoneNumber)
                 }
                 syncRecentCallLogs()
             }
+            
+            ACTION_SCAN_RECORDINGS -> {
+                // Manual scan for all recent recordings
+                scheduleRecordingFinder(scanAll = true)
+            }
+            
             else -> syncRecentCallLogs()
         }
         
@@ -165,7 +178,6 @@ class CallMonitorService : Service() {
 
     override fun onDestroy() {
         unregisterCallLogObserver()
-        callRecorder?.release()
         super.onDestroy()
     }
 
@@ -236,20 +248,9 @@ class CallMonitorService : Service() {
                 
                 Log.d(TAG, "Found ${newCalls.size} new call logs to save")
                 
-                // Link recording to latest call if available
-                val callsToInsert = if (lastRecordingFile != null && newCalls.isNotEmpty()) {
-                    val updatedCall = newCalls.first().copy(
-                        hasRecording = true,
-                        recordingPath = lastRecordingFile!!.absolutePath
-                    )
-                    lastRecordingFile = null
-                    listOf(updatedCall) + newCalls.drop(1)
-                } else {
-                    newCalls
-                }
-                
-                callLogDao.insertCallLogs(callsToInsert)
-                Log.d(TAG, "Inserted ${callsToInsert.size} call logs, triggering sync...")
+                // Recordings will be linked later by RecordingFinderWorker
+                callLogDao.insertCallLogs(newCalls)
+                Log.d(TAG, "Inserted ${newCalls.size} call logs, triggering sync...")
                 
                 // Trigger immediate sync to backend
                 triggerImmediateSync()
@@ -279,27 +280,53 @@ class CallMonitorService : Service() {
     }
     
     /**
-     * Upload recording file to server
+     * Schedule recording finder worker to discover OEM recordings.
+     * Runs with a delay to allow the native dialer to save the recording.
      */
-    private fun uploadRecordingToServer(file: File) {
-        serviceScope.launch {
-            try {
-                Log.d(TAG, "Uploading recording: ${file.name}")
-                
-                val requestBody = file.asRequestBody("audio/aac".toMediaTypeOrNull())
-                val filePart = MultipartBody.Part.createFormData("file", file.name, requestBody)
-                
-                val response = apiService.uploadRecording(filePart)
-                
-                if (response.isSuccessful) {
-                    val uploadResponse = response.body()
-                    Log.d(TAG, "Recording uploaded successfully: ${uploadResponse?.url}")
-                } else {
-                    Log.e(TAG, "Failed to upload recording: ${response.code()} ${response.message()}")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error uploading recording", e)
-            }
-        }
+    private fun scheduleRecordingFinder(
+        callEndTime: Long = System.currentTimeMillis(),
+        phoneNumber: String? = null,
+        scanAll: Boolean = false
+    ) {
+        val inputData = workDataOf(
+            RecordingFinderWorker.KEY_CALL_END_TIME to callEndTime,
+            RecordingFinderWorker.KEY_PHONE_NUMBER to phoneNumber,
+            RecordingFinderWorker.KEY_SCAN_ALL_RECENT to scanAll
+        )
+        
+        val request = OneTimeWorkRequestBuilder<RecordingFinderWorker>()
+            .setInitialDelay(RECORDING_FINDER_DELAY_SECONDS, TimeUnit.SECONDS)
+            .setInputData(inputData)
+            .build()
+        
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            "recording_finder_${callEndTime}",
+            ExistingWorkPolicy.KEEP,
+            request
+        )
+        
+        Log.d(TAG, "Recording finder scheduled for ${RECORDING_FINDER_DELAY_SECONDS}s from now")
+    }
+    
+    /**
+     * Schedule upload of pending recordings
+     */
+    private fun scheduleRecordingUpload() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+            
+        val request = OneTimeWorkRequestBuilder<RecordingUploadWorker>()
+            .setConstraints(constraints)
+            .setInputData(workDataOf(RecordingUploadWorker.KEY_BATCH_MODE to true))
+            .build()
+            
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            "recording_upload",
+            ExistingWorkPolicy.KEEP,
+            request
+        )
+        
+        Log.d(TAG, "Recording upload scheduled")
     }
 }

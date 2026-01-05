@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:tag="layout/sheet_user_selection_0"
+    android:visibility="visible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:behavior_hideable="true"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Superfone.BottomSheetCard">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.google.android.material.button.MaterialButton
+                android:gravity="center_vertical"
+                android:id="@+id/sheetRemoveUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/remove_workspace_selected_heading"
+                app:icon="@drawable/ic_remove_user"
+                app:iconPadding="@dimen/grid_2"
+                style="@style/Widget.Superfone.TextButton"/>
+            <View
+                android:background="@drawable/ic_bottom_border"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:gravity="center_vertical"
+                android:id="@+id/sheetAddToTeam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/add_to_team"
+                app:icon="@drawable/ic_team"
+                app:iconPadding="@dimen/grid_2"
+                style="@style/Widget.Superfone.TextButton"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

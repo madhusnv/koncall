@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/fragment_intro_screen_three_0"
+    android:background="?attr/colorSurface"
+    android:padding="@dimen/grid_2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Headline4"
+        android:textColor="@color/superfone_black"
+        android:gravity="center"
+        android:id="@+id/landingSubTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_4"
+        android:text="Over 70% of your sales is about making those calls"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backgroundCircle"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Subtitle1"
+        android:textColor="@color/superfone_blue"
+        android:id="@+id/landingSubTitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_2"
+        android:text="Capture call outcomes right after call"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/landingSubTitle"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Subtitle1"
+        android:textColor="@color/superfone_blue"
+        android:id="@+id/landingSubTitle3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_2"
+        android:text="All +ve, -ve, missed, unpicked calls tracked for you"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/landingSubTitle2"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textAppearance="@style/TextAppearance.Superfone.Subtitle1"
+        android:textColor="@color/superfone_blue"
+        android:id="@+id/landingSubTitle4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_2"
+        android:text="Leads auto-created on call"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/landingSubTitle3"/>
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/backgroundCircle"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="V, 1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintWidth_percent="0.7"
+        app:srcCompat="@drawable/ic_intro_phone"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

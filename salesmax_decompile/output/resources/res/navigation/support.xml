@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/support"
+    app:startDestination="@+id/support_start">
+    <fragment
+        android:label="TemplatesFragment"
+        android:name="ai.salesmax.ui.support.ResourcesAndSupportFragment"
+        android:id="@+id/support_start">
+        <action
+            android:id="@+id/action_home_to_workspace_selection"
+            app:destination="@+id/workspaceSelector"/>
+        <action
+            android:id="@+id/action_support_to_chatWindowInternal"
+            app:destination="@+id/teamChatWindow"/>
+    </fragment>
+    <fragment
+        android:label="TeamChatWindowFragment"
+        android:name="ai.salesmax.ui.home.TeamChatWindowFragment"
+        android:id="@+id/teamChatWindow"/>
+    <fragment
+        android:label="WorkspaceSelector"
+        android:name="ai.salesmax.ui.home.WorkspaceSelector"
+        android:id="@+id/workspaceSelector">
+        <action
+            android:id="@+id/action_workspaceSelector_to_landing"
+            app:destination="@+id/landing"
+            app:popUpTo="@+id/home_start"
+            app:popUpToInclusive="true"/>
+    </fragment>
+</navigation>

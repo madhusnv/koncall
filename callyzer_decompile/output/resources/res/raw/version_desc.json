@@ -1,0 +1,47 @@
+[
+  {
+    "versionName": "2.9.9",
+    "releaseDate": "25-Dec-2025",
+    "bug": {
+      "descriptions": [
+        "Bug fixes and performance improvements to enhance overall app stability and user experience."
+      ]
+    }
+  },
+  {
+    "versionName": "2.9.8",
+    "releaseDate": "23-Dec-2025",
+    "bug": {
+      "descriptions": [
+        "Bug fixes and performance improvements to enhance overall app stability and user experience."
+      ]
+    }
+  },
+  {
+    "versionName": "2.9.7",
+    "releaseDate": "22-Dec-2025",
+    "bug": {
+      "descriptions": [
+        "Bug fixes and performance improvements to enhance overall app stability and user experience."
+      ]
+    }
+  },
+  {
+    "versionName": "2.9.5",
+    "releaseDate": "05-Dec-2025",
+    "bug": {
+      "descriptions": [
+        "Bug fixes and performance improvements to enhance overall app stability and user experience."
+      ]
+    }
+  },
+  {
+    "versionName": "2.9.4",
+    "releaseDate": "29-Nov-2025",
+    "bug": {
+      "descriptions": [
+        "Bug fixes and performance improvements to enhance overall app stability and user experience."
+      ]
+    }
+  }
+]

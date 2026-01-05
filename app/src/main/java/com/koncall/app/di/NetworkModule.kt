@@ -3,6 +3,7 @@ package com.koncall.app.di
 import android.content.Context
 import com.koncall.app.BuildConfig
 import com.koncall.app.data.remote.api.KonCallApiService
+import com.koncall.app.service.recording.RecordingFinder
 import com.koncall.app.util.AuthInterceptor
 import com.koncall.app.util.TokenManager
 import dagger.Module
@@ -66,5 +67,11 @@ object NetworkModule {
     @Singleton
     fun provideApiService(retrofit: Retrofit): KonCallApiService {
         return retrofit.create(KonCallApiService::class.java)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideRecordingFinder(@ApplicationContext context: Context): RecordingFinder {
+        return RecordingFinder(context)
     }
 }

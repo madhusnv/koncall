@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/content_shimmer_chat_other_0"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/grid_1"
+    android:layout_marginBottom="@dimen/grid_1">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/shimmer_itemLeadRoot"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/grid_8"
+        android:layout_marginBottom="1dp"
+        android:animateLayoutChanges="true"
+        android:backgroundTint="@color/superfone_gray_200"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="1dp"
+        app:cardMaxElevation="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.8"
+        app:materialThemeOverlay="@style/ThemeOverlay.Superfone.ElevationOverlayDisabled"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -76,4 +76,55 @@ interface CallLogDao {
     
     @Query("SELECT * FROM call_logs WHERE phoneNumber = :phoneNumber ORDER BY callDateTime DESC LIMIT 1")
     suspend fun getLatestCallLogByPhoneNumber(phoneNumber: String): CallLogEntity?
+    
+    // ===== Recording-related queries =====
+    
+    @Query("""
+        SELECT * FROM call_logs 
+        WHERE hasRecording = 0 
+        AND callDateTime BETWEEN :startTime AND :endTime 
+        ORDER BY callDateTime DESC
+    """)
+    suspend fun getCallsWithoutRecording(startTime: Long, endTime: Long): List<CallLogEntity>
+    
+    @Query("""
+        SELECT * FROM call_logs 
+        WHERE hasRecording = 0 
+        AND duration > 0 
+        ORDER BY callDateTime DESC 
+        LIMIT :limit
+    """)
+    suspend fun getRecentCallsNeedingRecording(limit: Int = 50): List<CallLogEntity>
+    
+    @Query("""
+        UPDATE call_logs SET 
+            hasRecording = 1,
+            recordingUri = :uri,
+            recordingFileName = :fileName,
+            recordingMimeType = :mimeType,
+            recordingSize = :size,
+            recordingSyncStatus = :syncStatus,
+            updatedAt = :updatedAt
+        WHERE id = :callLogId
+    """)
+    suspend fun linkRecording(
+        callLogId: String,
+        uri: String,
+        fileName: String,
+        mimeType: String?,
+        size: Long,
+        syncStatus: String,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+    
+    @Query("UPDATE call_logs SET recordingSyncStatus = :status, recordingServerUrl = :serverUrl, updatedAt = :updatedAt WHERE id = :callLogId")
+    suspend fun updateRecordingUpload(
+        callLogId: String,
+        status: String,
+        serverUrl: String?,
+        updatedAt: Long = System.currentTimeMillis()
+    )
+    
+    @Query("SELECT * FROM call_logs WHERE hasRecording = 1 AND recordingSyncStatus = :status")
+    suspend fun getCallsWithRecordingByStatus(status: String): List<CallLogEntity>
 }

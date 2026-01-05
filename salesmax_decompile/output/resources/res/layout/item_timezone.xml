@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center_vertical"
+    android:id="@+id/timezoneitem"
+    android:tag="layout/item_timezone_0"
+    android:paddingBottom="@dimen/grid_0_5"
+    android:visibility="visible"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:icon="@drawable/ic_arrow_right"
+    app:iconGravity="end"
+    app:iconPadding="@dimen/grid_2"
+    style="@style/Widget.Superfone.TextButton"/>

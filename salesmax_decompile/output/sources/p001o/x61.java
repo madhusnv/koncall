@@ -1,0 +1,6 @@
+package p001o;
+
+/* loaded from: classes2.dex */
+public interface x61 {
+    int getType();
+}

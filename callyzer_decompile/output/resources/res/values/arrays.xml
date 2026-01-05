@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="androidcolors">
+        <item>@color/blue</item>
+    </array>
+    <array name="contact_us_type_selection_options">
+        <item>Report Bug</item>
+        <item>Suggest New Feature</item>
+        <item>Feedback</item>
+    </array>
+    <array name="fact_message_array">
+        <item>The first mobile phone call was made on April 3, 1973, by Motorola employee Martin Cooper from Sixth Avenue in New York while walking between 53rd and 54th streets.</item>
+        <item>The first cell phones went on sale in the US in 1983, costing about $4,000 each!</item>
+        <item>Mark Twain was one of the first to have a phone in his home.</item>
+        <item>The very first phone call was: “Watson come here, I want you!”</item>
+        <item>According to a recent survey, 47 percent of all water-damaged mobile phones in the UK have been dropped in the toilet bowl.</item>
+        <item>Alexander Graham Bell originally suggested \'ahoy\' be adopted as the standard greeting when answering a telephone (as used in ships), but was later superseded by Thomas Edison, who suggested ‘hello’ instead.</item>
+        <item>Frigensophobia is the fear that using your mobile is damaging your brain.</item>
+        <item>Washington, DC has the highest call volume per capita with 415 calls per 1,000 people.</item>
+        <item>Men account for 53% of customer calls, women clock in at 47%.</item>
+        <item>Mississippi is the top state with 286 calls per 1,000 people.</item>
+        <item>Vermont has the lowest call volume per capita, but that’s only because someone had to come in last.</item>
+        <item>65% of people prefer to contact a business by phone, only 24% prefer filling out online forms.</item>
+        <item>Mondays receive the highest volume of calls, with 55% more calls than the lowest volume day, Sunday.</item>
+        <item>The first smartphone was made by IBM. The very first smartphone is actually over 20-years-old and was launched on August 16, 1994, by IBM. Initially, code-named the “Angler”</item>
+        <item>The Highest Mobile bill was $201,000</item>
+        <item>British jeweler Stuart Hughes lays claim to creating the world\'s most expensive mobile phone. The iPhone 4 Diamond Rose edition boasts a price tag of £5 million, which currently translates to $8,184,968.42.</item>
+        <item>Telephonophobia is the fear of making or receiving phone calls.</item>
+        <item>Addiction to mobile phones is called Nomophobia (no-mobile-phone phobia), it is the fear of being out of contact either by your phone being lost, out of juice or out of signal range.</item>
+        <item>Ringxiety or fauxcellarm is described as a psycho-acoustic phenomenon when you hear (or feel) your mobile ringing when it\'s not.</item>
+        <item>The world\'s most popular phone is the Nokia 1100, a basic GSM Candybar launched in 2003. Over 250 million 1100s have been sold. Nokia\'s 3210 and 3310 also made the top five, while the last slot belongs to the iconic Motorola RAZR.</item>
+        <item>The top 5 countries in the world with the most currently active cell phones are: China: 1.2 billion phones; India: 904 million phones; U.S. 327 million phones; Brazil: 276 million phones; and Russia: 256 million phones.</item>
+        <item>We check our mobile phone about 150 times a day on average</item>
+        <item>There are already more mobile phones than people in our world</item>
+        <item>In Finland, throwing mobile phones is a sport. But wait, the best part is that it is also organised annually, since the year 2000, a world championship in throwing mobile phones is held. The distance record, to date, is set at 97 meters for men and 40 meters for women.</item>
+    </array>
+</resources>

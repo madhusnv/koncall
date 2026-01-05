@@ -1,0 +1,64 @@
+package type;
+
+import com.apollographql.apollo.api.Input;
+import com.apollographql.apollo.api.InputFieldMarshaller;
+import com.apollographql.apollo.api.InputFieldWriter;
+import com.apollographql.apollo.api.InputType;
+
+/* loaded from: classes7.dex */
+public final class SearchableSubmittedFormValueSortInput implements InputType {
+    private final Input<SearchableSortDirection> direction;
+    private final Input<SearchableSubmittedFormValueSortableFields> field;
+
+    public static final class Builder {
+        private Input<SearchableSubmittedFormValueSortableFields> field = Input.absent();
+        private Input<SearchableSortDirection> direction = Input.absent();
+
+        public SearchableSubmittedFormValueSortInput build() {
+            return new SearchableSubmittedFormValueSortInput(this.field, this.direction);
+        }
+
+        public Builder direction(SearchableSortDirection searchableSortDirection) {
+            this.direction = Input.fromNullable(searchableSortDirection);
+            return this;
+        }
+
+        public Builder field(SearchableSubmittedFormValueSortableFields searchableSubmittedFormValueSortableFields) {
+            this.field = Input.fromNullable(searchableSubmittedFormValueSortableFields);
+            return this;
+        }
+    }
+
+    public SearchableSubmittedFormValueSortInput(Input<SearchableSubmittedFormValueSortableFields> input, Input<SearchableSortDirection> input2) {
+        this.field = input;
+        this.direction = input2;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public SearchableSortDirection direction() {
+        return this.direction.value;
+    }
+
+    public SearchableSubmittedFormValueSortableFields field() {
+        return this.field.value;
+    }
+
+    @Override // com.apollographql.apollo.api.InputType
+    public InputFieldMarshaller marshaller() {
+        return new InputFieldMarshaller() { // from class: type.SearchableSubmittedFormValueSortInput.1
+            /* JADX WARN: Multi-variable type inference failed */
+            @Override // com.apollographql.apollo.api.InputFieldMarshaller
+            public void marshal(InputFieldWriter inputFieldWriter) {
+                if (SearchableSubmittedFormValueSortInput.this.field.defined) {
+                    inputFieldWriter.writeString("field", SearchableSubmittedFormValueSortInput.this.field.value != 0 ? ((SearchableSubmittedFormValueSortableFields) SearchableSubmittedFormValueSortInput.this.field.value).name() : null);
+                }
+                if (SearchableSubmittedFormValueSortInput.this.direction.defined) {
+                    inputFieldWriter.writeString("direction", SearchableSubmittedFormValueSortInput.this.direction.value != 0 ? ((SearchableSortDirection) SearchableSubmittedFormValueSortInput.this.direction.value).name() : null);
+                }
+            }
+        };
+    }
+}

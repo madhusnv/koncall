@@ -6,6 +6,7 @@ import com.koncall.app.data.local.KonCallDatabase
 import com.koncall.app.data.local.dao.CallLogDao
 import com.koncall.app.data.local.dao.CallNoteDao
 import com.koncall.app.data.local.dao.LeadDao
+import com.koncall.app.data.local.dao.RecordingDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,5 +45,11 @@ object DatabaseModule {
     @Singleton
     fun provideLeadDao(database: KonCallDatabase): LeadDao {
         return database.leadDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRecordingDao(database: KonCallDatabase): RecordingDao {
+        return database.recordingDao()
     }
 }

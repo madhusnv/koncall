@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/itemLeadRoot"
+    android:tag="layout/item_user_management_0"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/grid_1"
+    android:animateLayoutChanges="true"
+    app:cardCornerRadius="@dimen/grid_1_5"
+    app:cardElevation="@dimen/grid_1_5"
+    app:cardMaxElevation="@dimen/grid_1_5"
+    app:strokeWidth="0dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintDimensionRatio="V, 1:1">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/itemIcon"
+            android:tag="binding_1"
+            android:layout_width="@dimen/grid_5"
+            android:layout_height="@dimen/grid_5"
+            android:layout_marginTop="@dimen/grid_3"
+            app:backgroundTint="?attr/colorPrimary"
+            app:iconTint="?attr/colorOnPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/ShapeAppearance.Superfone.SmallComponentNonRound"
+            style="@style/Superfone.Button.IconOnly"/>
+        <com.google.android.material.textview.MaterialTextView
+            android:textAppearance="@style/TextAppearance.Superfone.Headline5"
+            android:textColor="?attr/colorOnSurface"
+            android:gravity="center"
+            android:id="@+id/title"
+            android:tag="binding_2"
+            android:paddingBottom="@dimen/grid_3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/grid_2"
+            android:layout_marginStart="@dimen/grid_1"
+            android:layout_marginEnd="@dimen/grid_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemIcon"
+            app:layout_constraintVertical_chainStyle="packed"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

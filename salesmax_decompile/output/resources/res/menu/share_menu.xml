@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" app:showAsAction="always">
+    <item
+        android:icon="@drawable/ic_call"
+        android:id="@+id/Call"
+        android:title="Call"
+        android:iconTint="?attr/colorPrimary"
+        app:showAsAction="always"/>
+    <item
+        android:icon="@drawable/ic_whatsapp"
+        android:id="@+id/Whatsapp"
+        android:title="Whatsapp"
+        android:iconTint="?attr/colorPrimary"
+        app:showAsAction="always"/>
+    <item
+        android:icon="@drawable/ic_plus"
+        android:id="@+id/Content"
+        android:title="Content"
+        android:iconTint="?attr/colorPrimary"
+        app:showAsAction="always"/>
+    <item
+        android:icon="@drawable/ic_comment"
+        android:id="@+id/Message"
+        android:title="Message"
+        android:iconTint="?attr/colorPrimary"
+        app:showAsAction="always"/>
+    <item
+        android:icon="@drawable/ic_share"
+        android:id="@+id/Share"
+        android:title="Share"
+        android:iconTint="?attr/colorPrimary"
+        app:showAsAction="always"/>
+</menu>

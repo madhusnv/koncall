@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:tag="layout/fragment_select_contact_0"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/grid_5"
+        app:layout_constraintTop_toTopOf="parent">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:background="#ffffff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:contentInsetStart="0dp"
+            android:contentInsetEnd="0dp"
+            android:contentInsetLeft="0dp"
+            android:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetStart="0dp"
+            app:layout_scrollFlags="enterAlways|scroll">
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/leadsAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/goBack"
+                        android:padding="@dimen/grid_1_5"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:src="@drawable/ic_back_arrow"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="H, 1:1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+                    <com.google.android.material.textview.MaterialTextView
+                        android:textAppearance="@style/TextAppearance.Superfone.Headline5"
+                        android:gravity="center"
+                        android:id="@+id/leadTitle"
+                        android:layout_width="268dp"
+                        android:layout_height="62dp"
+                        android:text="Select Lead To Chat"
+                        android:maxLines="1"
+                        android:layout_marginStart="@dimen/grid_2"
+                        android:layout_marginEnd="@dimen/grid_2"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:visibility="visible"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/grid_0_5">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/searchLeadsEditTextLayout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/grid_2"
+                        android:layout_marginEnd="@dimen/grid_2"
+                        android:backgroundTint="?attr/colorPrimary"
+                        app:boxCornerRadiusBottomEnd="24dp"
+                        app:boxCornerRadiusBottomStart="24dp"
+                        app:boxCornerRadiusTopEnd="24dp"
+                        app:boxCornerRadiusTopStart="24dp"
+                        app:endIconDrawable="@drawable/ic_microphone"
+                        app:endIconMode="custom"
+                        app:hintAnimationEnabled="false"
+                        app:hintEnabled="false"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:startIconDrawable="0x7f080458"
+                        style="@style/Superfone.Input.WithoutLine">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:textAppearance="@style/TextAppearance.Superfone.Body1"
+                            android:id="@+id/searchLeadsEditText"
+                            android:background="@drawable/board_selected"
+                            android:paddingTop="0dp"
+                            android:paddingBottom="0dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Search Lead"
+                            android:maxLines="1"
+                            android:inputType="textNoSuggestions"
+                            android:imeOptions="actionDone"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerLayout"
+        android:animationCache="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:animateLayoutChanges="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:shimmer_repeat_mode="restart"
+        app:shimmer_shape="radial">
+        <LinearLayout
+            android:orientation="vertical"
+            android:tag="binding_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:orientation="vertical"
+        android:id="@+id/rvCallLogsList"
+        android:scrollbars="vertical"
+        android:clipToPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:nestedScrollingEnabled="true"
+        app:layoutManager="ai.salesmax.view.WrapContentLinearLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:spanCount="1"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

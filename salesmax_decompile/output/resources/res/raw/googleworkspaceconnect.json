@@ -1,0 +1,9 @@
+{
+  "type": "google_workspace_account",
+  "project_id": "SalesmaxGoogleMeet",
+  "client_email": "admin@salesmax.ai",
+  "client_id": "757232369823-1m3af9l51t90skit5bh8dmm5mvjaf0np.apps.googleusercontent.com",
+  "client_secret": "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",
+  "server_url": "https://integration.dev.salesmax.ai/action",
+  "action": "CREATE_CONNECTION"
+}

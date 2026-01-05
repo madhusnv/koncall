@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:tag="layout/fragment_chat_channels_0"
+    android:visibility="visible"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:behavior_hideable="true"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerLayout"
+        android:animationCache="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_2"
+        android:animateLayoutChanges="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shimmer_repeat_mode="restart"
+        app:shimmer_shape="radial">
+        <LinearLayout
+            android:orientation="vertical"
+            android:tag="binding_1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+            <include layout="@layout/content_shimmer_leads"/>
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:orientation="vertical"
+        android:id="@+id/rvFragmentList"
+        android:paddingTop="@dimen/grid_3"
+        android:scrollbars="vertical"
+        android:clipToPadding="false"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:nestedScrollingEnabled="true"
+        app:layoutManager="ai.salesmax.view.WrapContentLinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:spanCount="1"/>
+    <LinearLayout
+        android:id="@+id/header_title_layout"
+        android:background="@color/white_80"
+        android:paddingBottom="@dimen/grid_0_5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/grid_1_5"
+        android:paddingEnd="@dimen/grid_1_5"
+        app:layout_constraintTop_toTopOf="parent">
+        <com.google.android.material.textview.MaterialTextView
+            android:textAppearance="@style/TextAppearance.Superfone.Headline5"
+            android:textColor="?attr/colorOnSurface"
+            android:id="@+id/header_title"
+            android:background="@color/white"
+            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/grid_0_5"
+            android:layout_marginEnd="@dimen/grid_0_5"/>
+    </LinearLayout>
+    <include
+        android:id="@+id/contentNoItems"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        layout="@layout/content_no_chat_channels"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,15 @@
+package com.google.android.gms.cast.framework;
+
+import android.os.IBinder;
+import android.os.IInterface;
+
+/* loaded from: classes5.dex */
+public abstract class zzal extends com.google.android.gms.internal.cast.zzb implements zzam {
+    public static zzam zzb(IBinder iBinder) {
+        if (iBinder == null) {
+            return null;
+        }
+        IInterface iInterfaceQueryLocalInterface = iBinder.queryLocalInterface("com.google.android.gms.cast.framework.ISession");
+        return iInterfaceQueryLocalInterface instanceof zzam ? (zzam) iInterfaceQueryLocalInterface : new zzak(iBinder);
+    }
+}

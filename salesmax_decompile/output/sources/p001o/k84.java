@@ -1,0 +1,6 @@
+package p001o;
+
+/* loaded from: classes6.dex */
+public interface k84 {
+    k84 getCallerFrame();
+}

@@ -1,0 +1,10 @@
+{
+  "apis": {
+    "EmailVerificationService": {
+      "endpointType": "REST",
+      "endpoint": "https://ji2shw5ojhyx3bcq3p2nfddrue0ppamz.lambda-url.ap-south-1.on.aws/",
+      "region": "ap-south-1",
+      "authorizationType": "AWS_IAM"
+    }
+  }
+}
