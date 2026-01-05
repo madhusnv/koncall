@@ -144,3 +144,15 @@ koncall_api/test/support/fixtures/
 
 # Other projects in same folder (not part of this repo)
 admission_system/
+
+# Decompiled APKs (analysis only)
+callyzer_decompile/
+salesmax_decompile/
+CALLYZER_ANALYSIS.md
+SALESMAX_ANALYSIS.md
+*.apk
+
+# Decompiled APKs
+callyzer_decompile/
+salesmax_decompile/
+*.apk

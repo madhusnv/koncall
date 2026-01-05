@@ -1,8 +1,0 @@
-package org.apache.http.entity;
-
-import java.io.OutputStream;
-
-/* loaded from: classes6.dex */
-public interface ContentProducer {
-    void writeTo(OutputStream outputStream);
-}
