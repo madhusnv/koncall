@@ -1,5 +1,6 @@
 package com.koncall.app.data.repository
 
+import com.koncall.app.data.local.dao.LeadDao
 import com.koncall.app.data.remote.api.KonCallApiService
 import com.koncall.app.data.remote.dto.*
 import com.koncall.app.util.ApiErrorParser
@@ -10,7 +11,8 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepository @Inject constructor(
     private val apiService: KonCallApiService,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val leadDao: LeadDao  // Added to clear local data on logout
 ) {
     suspend fun login(orgCode: String, phone: String, password: String): Result<UserDto> {
         val request = LoginRequest(
@@ -87,7 +89,9 @@ class AuthRepository @Inject constructor(
         } catch (e: Exception) {
             // Ignore logout errors
         }
+        // CRITICAL: Clear all local data to prevent data leakage between users
         tokenManager.clearAuth()
+        leadDao.deleteAll()  // Clear cached leads from previous user
     }
     
     suspend fun isLoggedIn(): Boolean = tokenManager.getToken() != null
