@@ -21,6 +21,9 @@ class TokenManager(private val context: Context) {
         private val ORG_ID_KEY = stringPreferencesKey("org_id")
         private val DEVICE_ID_KEY = stringPreferencesKey("device_id")
         private val USER_NAME_KEY = stringPreferencesKey("user_name")
+        private val USER_EMAIL_KEY = stringPreferencesKey("user_email")
+        private val USER_ROLE_KEY = stringPreferencesKey("user_role")
+        private val ORG_NAME_KEY = stringPreferencesKey("org_name")
     }
 
     val tokenFlow: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -36,7 +39,10 @@ class TokenManager(private val context: Context) {
         userId: String,
         orgId: String,
         deviceId: String?,
-        userName: String
+        userName: String,
+        userEmail: String? = null,
+        userRole: String? = null,
+        orgName: String? = null
     ) {
         context.dataStore.edit { prefs ->
             prefs[TOKEN_KEY] = token
@@ -44,6 +50,9 @@ class TokenManager(private val context: Context) {
             prefs[ORG_ID_KEY] = orgId
             deviceId?.let { prefs[DEVICE_ID_KEY] = it }
             prefs[USER_NAME_KEY] = userName
+            userEmail?.let { prefs[USER_EMAIL_KEY] = it }
+            userRole?.let { prefs[USER_ROLE_KEY] = it }
+            orgName?.let { prefs[ORG_NAME_KEY] = it }
         }
     }
 
@@ -65,6 +74,22 @@ class TokenManager(private val context: Context) {
 
     suspend fun getDeviceId(): String? {
         return context.dataStore.data.first()[DEVICE_ID_KEY]
+    }
+
+    suspend fun getUserName(): String? {
+        return context.dataStore.data.first()[USER_NAME_KEY]
+    }
+
+    suspend fun getUserEmail(): String? {
+        return context.dataStore.data.first()[USER_EMAIL_KEY]
+    }
+
+    suspend fun getUserRole(): String? {
+        return context.dataStore.data.first()[USER_ROLE_KEY]
+    }
+
+    suspend fun getOrgName(): String? {
+        return context.dataStore.data.first()[ORG_NAME_KEY]
     }
 
     suspend fun clearAuth() {

@@ -38,8 +38,7 @@ import com.koncall.app.ui.theme.KonCallColors
 fun LeadsScreen(
     viewModel: LeadsViewModel,
     onLeadClick: (String) -> Unit,
-    onCreateLead: () -> Unit,
-    onNavigateBack: () -> Unit
+    onCreateLead: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -168,15 +167,6 @@ fun LeadsScreen(
                         fontWeight = FontWeight.SemiBold
                     ) 
                 },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack, 
-                            contentDescription = "Back",
-                            tint = KonCallColors.TextSecondary
-                        )
-                    }
-                },
                 actions = {
                     IconButton(onClick = viewModel::syncLeadsFromServer) {
                         Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = KonCallColors.Teal)
@@ -294,8 +284,8 @@ fun LeadsScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(filteredLeads, key = { it.id }) { lead ->
                         LeadItem(
@@ -371,37 +361,37 @@ private fun LeadItem(
     
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = KonCallColors.SurfaceCard)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar
+            // Avatar - smaller
             Surface(
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier.size(40.dp),
                 shape = CircleShape,
                 color = stageColor.copy(alpha = 0.15f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
                         text = lead.displayName.take(1).uppercase(),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = stageColor
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = lead.displayName,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = KonCallColors.TextPrimary,
                     maxLines = 1,
@@ -412,41 +402,30 @@ private fun LeadItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = KonCallColors.TextSecondary
                 )
-                if (lead.universityName != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = lead.universityName,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = KonCallColors.Teal
-                    )
-                }
             }
             
-            Column(horizontalAlignment = Alignment.End) {
-                // Stage badge
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = stageColor.copy(alpha = 0.1f)
-                ) {
-                    Text(
-                        text = LeadStage.displayName(lead.stage),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = stageColor,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Arrow
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = KonCallColors.TextTertiary,
-                    modifier = Modifier.size(20.dp)
+            // Stage badge - inline
+            Surface(
+                shape = RoundedCornerShape(6.dp),
+                color = stageColor.copy(alpha = 0.1f)
+            ) {
+                Text(
+                    text = LeadStage.displayName(lead.stage),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = stageColor,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                 )
             }
+            
+            Spacer(modifier = Modifier.width(4.dp))
+            
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = KonCallColors.TextTertiary,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }

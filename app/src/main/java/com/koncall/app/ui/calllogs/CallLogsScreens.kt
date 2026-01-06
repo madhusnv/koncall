@@ -44,8 +44,7 @@ import java.util.*
 @Composable
 fun CallLogsScreen(
     viewModel: CallLogsViewModel,
-    onCallLogClick: (String) -> Unit,
-    onNavigateBack: () -> Unit
+    onCallLogClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -68,15 +67,6 @@ fun CallLogsScreen(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.SemiBold
                     ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack, 
-                            contentDescription = "Back",
-                            tint = KonCallColors.TextSecondary
-                        )
-                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = KonCallColors.BackgroundDeep,
@@ -214,8 +204,8 @@ fun CallLogsScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(uiState.callLogs, key = { it.id }) { callLog ->
                         CallLogItem(
@@ -252,7 +242,7 @@ private fun CallLogItem(
 
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = KonCallColors.SurfaceCard
         )
@@ -264,19 +254,19 @@ private fun CallLogItem(
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(4.dp)
+                    .width(3.dp)
                     .background(accentColor)
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    modifier = Modifier.size(42.dp),
-                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.size(36.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = accentColor.copy(alpha = 0.15f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -284,23 +274,22 @@ private fun CallLogItem(
                             imageVector = icon,
                             contentDescription = null,
                             tint = accentColor,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
                 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(12.dp))
                 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = callLog.contactName ?: callLog.phoneNumber,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = KonCallColors.TextPrimary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = if (callLog.contactName != null) callLog.phoneNumber else formatTime(callLog.callDateTime),
                         style = MaterialTheme.typography.bodySmall,
@@ -308,21 +297,11 @@ private fun CallLogItem(
                     )
                 }
                 
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = formatDuration(callLog.duration),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = KonCallColors.TextPrimary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    if (callLog.contactName != null) {
-                        Text(
-                            text = formatTime(callLog.callDateTime),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = KonCallColors.TextTertiary
-                        )
-                    }
-                }
+                Text(
+                    text = formatDuration(callLog.duration),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = KonCallColors.TextPrimary
+                )
             }
         }
     }

@@ -178,35 +178,6 @@ fun DashboardScreen(
                 )
             }
             
-            Spacer(modifier = Modifier.height(28.dp))
-            
-            // Quick Actions Section
-            Text(
-                text = "Quick Actions",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = KonCallColors.TextPrimary
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            QuickActionCard(
-                icon = Icons.Default.List,
-                iconColor = KonCallColors.Teal,
-                title = "Call Logs",
-                description = "View and manage your call history",
-                onClick = onNavigateToCallLogs
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            QuickActionCard(
-                icon = Icons.Default.Person,
-                iconColor = KonCallColors.Violet,
-                title = "Leads",
-                description = "Manage your contacts and leads",
-                onClick = onNavigateToLeads
-            )
             
             Spacer(modifier = Modifier.height(24.dp))
         }

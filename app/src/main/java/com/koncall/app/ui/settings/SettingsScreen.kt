@@ -83,12 +83,95 @@ fun SettingsScreen(
         },
         containerColor = KonCallColors.BackgroundDeep
     ) { paddingValues ->
+        val userProfile by viewModel.userProfile.collectAsState()
+        
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Profile Section
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = KonCallColors.SurfaceCard)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Avatar
+                    Surface(
+                        modifier = Modifier.size(64.dp),
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        color = KonCallColors.Teal.copy(alpha = 0.15f)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = userProfile.name.take(1).uppercase(),
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = KonCallColors.Teal
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.width(16.dp))
+                    
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = userProfile.name.ifEmpty { "User" },
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = KonCallColors.TextPrimary
+                        )
+                        if (userProfile.email.isNotEmpty()) {
+                            Text(
+                                text = userProfile.email,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = KonCallColors.TextSecondary
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Role badge
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = when (userProfile.role.lowercase()) {
+                                    "admin" -> KonCallColors.Error.copy(alpha = 0.15f)
+                                    "manager" -> KonCallColors.Violet.copy(alpha = 0.15f)
+                                    else -> KonCallColors.Teal.copy(alpha = 0.15f)
+                                }
+                            ) {
+                                Text(
+                                    text = userProfile.role.replaceFirstChar { it.uppercase() },
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = when (userProfile.role.lowercase()) {
+                                        "admin" -> KonCallColors.Error
+                                        "manager" -> KonCallColors.Violet
+                                        else -> KonCallColors.Teal
+                                    },
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                            if (userProfile.orgName.isNotEmpty()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "• ${userProfile.orgName}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = KonCallColors.TextTertiary
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
             // Account Section
             Text(
                 "Account",

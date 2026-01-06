@@ -113,8 +113,7 @@ fun KonCallNavGraph(
                 viewModel = viewModel,
                 onCallLogClick = { callId ->
                     navController.navigate(Screen.CallDetail.createRoute(callId))
-                },
-                onNavigateBack = { navController.popBackStack() }
+                }
             )
         }
         
@@ -139,8 +138,7 @@ fun KonCallNavGraph(
                 onLeadClick = { leadId ->
                     navController.navigate(Screen.LeadDetail.createRoute(leadId))
                 },
-                onCreateLead = { navController.navigate(Screen.CreateLead.route) },
-                onNavigateBack = { navController.popBackStack() }
+                onCreateLead = { navController.navigate(Screen.CreateLead.route) }
             )
         }
         
