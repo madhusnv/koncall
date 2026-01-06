@@ -80,10 +80,8 @@ class RecordingFinderWorker @AssistedInject constructor(
             
             Log.d(TAG, "Recording finder complete: found=$found, matched=$matched")
             
-            // If we matched any recordings, trigger upload immediately
-            if (matched > 0) {
-                triggerUploadWorker()
-            }
+            // NOTE: Upload is now triggered by SyncWorker after call sync completes,
+            // ensuring serverId is available for proper linking
             
             Result.success(
                 workDataOf(
@@ -104,7 +102,9 @@ class RecordingFinderWorker @AssistedInject constructor(
 
     private fun triggerUploadWorker() {
         try {
+            // Add delay to ensure SyncWorker has completed and saved serverId
             val request = androidx.work.OneTimeWorkRequestBuilder<RecordingUploadWorker>()
+                .setInitialDelay(15, java.util.concurrent.TimeUnit.SECONDS)
                 .setConstraints(
                     androidx.work.Constraints.Builder()
                         .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
@@ -113,7 +113,7 @@ class RecordingFinderWorker @AssistedInject constructor(
                 .build()
             
             androidx.work.WorkManager.getInstance(context).enqueue(request)
-            Log.d(TAG, "Triggered RecordingUploadWorker")
+            Log.d(TAG, "Triggered RecordingUploadWorker (15s delay)")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to trigger upload worker", e)
         }

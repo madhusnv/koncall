@@ -70,6 +70,8 @@ class SyncWorker @AssistedInject constructor(
 
             if (response.isSuccessful) {
                 val result = response.body()?.data
+                var hasRecordingsToUpload = false
+                
                 result?.synced?.forEach { syncedLog ->
                     // Find local log by device call id and mark as synced
                     val localLog = callLogDao.getCallLogByDeviceId(syncedLog.deviceCallId)
@@ -79,8 +81,21 @@ class SyncWorker @AssistedInject constructor(
                         syncedLog.leadId?.let { leadId ->
                             callLogDao.linkToLead(it.id, leadId)
                         }
+                        
+                        // Check if this call has a pending recording to upload
+                        val updatedLog = callLogDao.getCallLogById(it.id)
+                        if (updatedLog?.hasRecording == true && 
+                            updatedLog.recordingSyncStatus == com.koncall.app.data.local.entity.RecordingSyncStatus.PENDING) {
+                            hasRecordingsToUpload = true
+                        }
                     }
                 }
+                
+                // Trigger upload if any synced calls have pending recordings
+                if (hasRecordingsToUpload) {
+                    triggerRecordingUpload()
+                }
+                
                 Result.success()
             } else {
                 // Mark as failed for retry
@@ -91,6 +106,23 @@ class SyncWorker @AssistedInject constructor(
             }
         } catch (e: Exception) {
             Result.retry()
+        }
+    }
+    
+    private fun triggerRecordingUpload() {
+        try {
+            val request = androidx.work.OneTimeWorkRequestBuilder<com.koncall.app.service.recording.RecordingUploadWorker>()
+                .setConstraints(
+                    androidx.work.Constraints.Builder()
+                        .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                        .build()
+                )
+                .build()
+            
+            androidx.work.WorkManager.getInstance(applicationContext).enqueue(request)
+            android.util.Log.d("SyncWorker", "Triggered RecordingUploadWorker after sync")
+        } catch (e: Exception) {
+            android.util.Log.e("SyncWorker", "Failed to trigger upload worker", e)
         }
     }
 }
