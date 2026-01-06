@@ -17,6 +17,7 @@ import dagger.assisted.AssistedInject
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.FileOutputStream
 
@@ -119,10 +120,17 @@ class RecordingUploadWorker @AssistedInject constructor(
         for (call in pendingCalls) {
             val uri = call.recordingUri ?: continue
             
+            // Must use serverId (backend's call_log ID) not local id
+            val serverCallLogId = call.serverId
+            if (serverCallLogId == null) {
+                Log.w(TAG, "Call ${call.id} has no serverId, skipping upload")
+                continue
+            }
+            
             val success = uploadRecording(
                 recordingId = null,
                 uri = Uri.parse(uri),
-                callLogId = call.id
+                callLogId = serverCallLogId
             )
             
             if (success) {
@@ -167,9 +175,10 @@ class RecordingUploadWorker @AssistedInject constructor(
                 
                 val requestBody = tempFile.asRequestBody(mimeType)
                 val filePart = MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
+                val callLogIdBody = callLogId.toRequestBody("text/plain".toMediaTypeOrNull())
                 
-                // Upload to server
-                val response = apiService.uploadRecording(filePart)
+                // Upload to server with call_log_id
+                val response = apiService.uploadRecording(filePart, callLogIdBody)
                 
                 if (response.isSuccessful) {
                     val uploadResponse = response.body()

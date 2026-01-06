@@ -33,6 +33,15 @@ defmodule KoncallApi.CallTracking do
     |> Repo.preload(preloads)
   end
 
+  @doc "List call logs for a specific lead"
+  def list_lead_call_logs(lead_id) do
+    CallLog
+    |> where([c], c.lead_id == ^lead_id)
+    |> order_by([c], desc: c.call_datetime)
+    |> preload(:notes)
+    |> Repo.all()
+  end
+
   @doc "Create a call log"
   def create_call_log(attrs \\ %{}) do
     result = %CallLog{}

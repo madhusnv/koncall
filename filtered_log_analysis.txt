@@ -1,0 +1,182 @@
+01-06 14:26:16.994 21080 21080 E AndroidRuntime: java.lang.RuntimeException: Unable to start service com.koncall.app.service.CallMonitorService@f283c4e with Intent { act=com.koncall.app.START_FOREGROUND cmp=com.koncall.app/.service.CallMonitorService }: java.lang.SecurityException: Starting FGS with type phoneCall callerApp=ProcessRecord{30345f3 21080:com.koncall.app/u0a243} targetSDK=36 requires permissions: all of the permissions allOf=true [android.permission.FOREGROUND_SERVICE_PHONE_CALL] any of the permissions allOf=false [android.permission.MANAGE_OWN_CALLS, android.app.role.DIALER] 
+01-06 14:26:16.994 21080 21080 E AndroidRuntime: 	at android.app.IActivityManager$Stub$Proxy.setServiceForeground(IActivityManager.java:7366)
+01-06 14:26:16.994 21080 21080 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.startForegroundMode(CallMonitorService.kt:143)
+01-06 14:26:16.994 21080 21080 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.onStartCommand(CallMonitorService.kt:114)
+01-06 14:31:34.319 24478 24478 E AndroidRuntime: java.lang.RuntimeException: Unable to start service com.koncall.app.service.CallMonitorService@b9328da with Intent { act=com.koncall.app.START_FOREGROUND cmp=com.koncall.app/.service.CallMonitorService }: java.lang.SecurityException: Starting FGS with type phoneCall callerApp=ProcessRecord{5e60671 24478:com.koncall.app/u0a243} targetSDK=36 requires permissions: all of the permissions allOf=true [android.permission.FOREGROUND_SERVICE_PHONE_CALL] any of the permissions allOf=false [android.permission.MANAGE_OWN_CALLS, android.app.role.DIALER] 
+01-06 14:31:34.319 24478 24478 E AndroidRuntime: 	at android.app.IActivityManager$Stub$Proxy.setServiceForeground(IActivityManager.java:7366)
+01-06 14:31:34.319 24478 24478 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.startForegroundMode(CallMonitorService.kt:143)
+01-06 14:31:34.319 24478 24478 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.onStartCommand(CallMonitorService.kt:114)
+01-06 14:53:06.777  6454  6454 E AndroidRuntime: java.lang.RuntimeException: Unable to start service com.koncall.app.service.CallMonitorService@94ab34 with Intent { act=com.koncall.app.START_FOREGROUND cmp=com.koncall.app/.service.CallMonitorService }: java.lang.SecurityException: Permission Denial: opening provider com.android.providers.contacts.CallLogProvider from ProcessRecord{77cda52 6454:com.koncall.app/u0a245} (pid=6454, uid=10245) requires android.permission.READ_CALL_LOG or android.permission.WRITE_CALL_LOG
+01-06 14:53:06.777  6454  6454 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.registerCallLogObserver(CallMonitorService.kt:162)
+01-06 14:53:06.777  6454  6454 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.startForegroundMode(CallMonitorService.kt:144)
+01-06 14:53:06.777  6454  6454 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.onStartCommand(CallMonitorService.kt:114)
+01-06 14:53:46.027  7357  7357 E AndroidRuntime: java.lang.RuntimeException: Unable to start service com.koncall.app.service.CallMonitorService@71c7021 with Intent { act=com.koncall.app.START_FOREGROUND cmp=com.koncall.app/.service.CallMonitorService }: java.lang.SecurityException: Permission Denial: opening provider com.android.providers.contacts.CallLogProvider from ProcessRecord{2226344 7357:com.koncall.app/u0a245} (pid=7357, uid=10245) requires android.permission.READ_CALL_LOG or android.permission.WRITE_CALL_LOG
+01-06 14:53:46.027  7357  7357 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.registerCallLogObserver(CallMonitorService.kt:162)
+01-06 14:53:46.027  7357  7357 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.startForegroundMode(CallMonitorService.kt:144)
+01-06 14:53:46.027  7357  7357 E AndroidRuntime: 	at com.koncall.app.service.CallMonitorService.onStartCommand(CallMonitorService.kt:114)
+01-06 14:58:29.587  1342  3782 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 8622, callingUid: 10152
+01-06 14:58:30.056  1342  2121 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:30.492  1342  1380 I ActivityManager: Start proc 8733:com.android.rkpdapp/u0a192 for service {com.android.rkpdapp/com.android.rkpdapp.service.RemoteProvisioningService}
+01-06 14:58:30.608  1342  5588 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 8733, callingUid: 10192
+01-06 14:58:30.757  1342  5588 D ActivityManager: getHistoricalProcessExitReasons pkg: com.google.android.apps.nbu.files, pid:  0, userId: 0, callingPid: 8410, callingUid: 10229
+01-06 14:58:31.058  1342  3782 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:32.060  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:33.062  1342  1359 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:33.750  1342  1370 I ActivityManager: Killing 8410:com.google.android.apps.nbu.files/u0a229 (adj 900): remove task
+01-06 14:58:34.199  1342  1370 I ActivityManager: Killing 7454:com.koncall.app/u0a245 (adj 900): remove task
+01-06 14:58:34.294  1342  1370 W ActivityManager: setHasOverlayUi called on unknown pid: 7454
+01-06 14:58:34.648  1342  1370 I ActivityManager: Killing 7876:com.android.server.telecom:ui/1000 (adj 975): empty #9
+01-06 14:58:34.650  1342  1370 I ActivityManager: Killing 7698:com.google.android.apps.subscriptions.red/u0a162 (adj 905): remove task
+01-06 14:58:34.651  1342  1384 D ActivityManager: quick sync unfreeze 7876 for 12
+01-06 14:58:34.654  1342  1384 D ActivityManager: quick sync unfreeze 7698 for 12
+01-06 14:58:34.722  1342  1370 W ActivityManager: setHasOverlayUi called on unknown pid: 7698
+01-06 14:58:35.185  1342  1376 W ActivityManager: Rescheduling restart of crashed service com.android.settings/.CabcService in 0ms for mem-pressure-event
+01-06 14:58:35.196  1342  1380 I ActivityManager: Start proc 8791:com.android.settings/1000 for service {com.android.settings/com.android.settings.CabcService}
+01-06 14:58:35.256  1342  1370 I ActivityManager: Killing 8506:com.android.vending/u0a152 (adj 915): remove task
+01-06 14:58:35.258  1342  1370 I ActivityManager: Killing 8622:com.android.vending:background/u0a152 (adj 925): remove task
+01-06 14:58:35.300  1342  5588 W ActivityManager: Scheduling restart of crashed service com.android.vending/com.google.frameworks.client.data.android.server.play.BackgroundProcessEndpointService in 1000ms for connection
+01-06 14:58:36.767  1342  1462 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:38.081  1342  1380 I ActivityManager: Start proc 8816:com.miui.android.fashiongallery/u0a218 for content provider {com.miui.android.fashiongallery/com.miui.android.fashiongallery.LockScreenMagazineProvider}
+01-06 14:58:38.109  1342  6254 D ActivityManager: add com.miui.android.fashiongallery to ColdStartingAppList
+01-06 14:58:38.597  1342  5588 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 8816, callingUid: 10218
+01-06 14:58:38.824  1342  1462 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 8816, callingUid: 10218
+01-06 14:58:38.861  1342  1380 I ActivityManager: Start proc 8878:com.google.android.youtube/u0a177 for service {com.google.android.youtube/androidx.work.impl.background.systemjob.SystemJobService}
+01-06 14:58:39.368  1342  5588 D ActivityManager: ThemeHomeDelay: Home launch is not delayable, ignoring setThemeOverlayReady() call
+01-06 14:58:40.020  1342  1380 I ActivityManager: Start proc 8968:com.android.vending/u0a152 for broadcast {com.android.vending/com.google.android.finsky.packagemonitor.impl.PackageMonitorReceiverImpl$RegisteredReceiver}
+01-06 14:58:40.194  1342  5390 D ActivityManager: getHistoricalProcessExitReasons pkg: com.android.vending, pid:  0, userId: 0, callingPid: 8968, callingUid: 10152
+01-06 14:58:40.330  1342  1380 I ActivityManager: Start proc 9021:com.android.vending:background/u0a152 for broadcast {com.android.vending/com.google.android.finsky.packagemonitor.backgroundimpl.BackgroundPackageMonitorReceiverImpl$RegisteredReceiver}
+01-06 14:58:40.495  1342  6254 D ActivityManager: getHistoricalProcessExitReasons pkg: com.android.vending, pid:  0, userId: 0, callingPid: 9021, callingUid: 10152
+01-06 14:58:40.598  1342  1495 D ActivityManager: freezing 8733 com.android.rkpdapp
+01-06 14:58:40.640  1342  1380 I ActivityManager: Start proc 9121:com.google.android.apps.nbu.files/u0a229 for broadcast {com.google.android.apps.nbu.files/com.google.android.apps.nbu.files.documentbrowser.browselanding.rootcontainerlist.receiver.PackageChangeReceiver_Receiver}
+01-06 14:58:40.835  1342  6689 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 8878, callingUid: 10177
+01-06 14:58:40.861  1342  1380 I ActivityManager: Start proc 9189:com.indus.appstore/u0a221 for broadcast {com.indus.appstore/com.indus.appstore.download.receiver.InstallBroadcastReceiver}
+01-06 14:58:40.918  1342  1461 I ActivityManager: Killing 8179:com.android.calllogbackup/u0a74 (adj 955): empty #9
+01-06 14:58:40.922  1342  1384 D ActivityManager: quick sync unfreeze 8179 for 12
+01-06 14:58:41.056  1342  4465 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 9021, callingUid: 10152
+01-06 14:58:41.056  1342  6254 I ActivityManager: Killing 7905:com.android.incallui/u0a88 (adj 945): empty #9
+01-06 14:58:41.060  1342  1384 D ActivityManager: quick sync unfreeze 7905 for 12
+01-06 14:58:41.219  1342  2938 D ActivityManager: getHistoricalProcessExitReasons pkg: com.google.android.youtube, pid:  0, userId: 0, callingPid: 8878, callingUid: 10177
+01-06 14:58:42.123  1342  2121 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 9189, callingUid: 10221
+01-06 14:58:42.510  1342  1380 I ActivityManager: Start proc 9332:com.xiaomi.mipicks/u0a130 for service {com.xiaomi.mipicks/com.xiaomi.mipicks.openstore.core.process.OpenProcessService}
+01-06 14:58:42.690  1342  5219 I ActivityManager: Killing 7834:android.process.acore/u0a74 (adj 935): empty #9
+01-06 14:58:42.692  1342  1384 D ActivityManager: quick sync unfreeze 7834 for 12
+01-06 14:58:42.787  1342  2351 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 9189, callingUid: 10221
+01-06 14:58:42.952  1342  1380 W ActivityManager: Slow operation: 52ms so far, now at startProcess: returned from zygote!
+01-06 14:58:42.952  1342  1380 W ActivityManager: Slow operation: 53ms so far, now at startProcess: done updating battery stats
+01-06 14:58:42.952  1342  1380 W ActivityManager: Slow operation: 53ms so far, now at startProcess: building log message
+01-06 14:58:42.952  1342  1380 I ActivityManager: Start proc 9405:com.android.chrome/u0a159 for service {com.android.chrome/org.chromium.chrome.browser.customtabs.CustomTabsConnectionService}
+01-06 14:58:42.952  1342  1380 W ActivityManager: Slow operation: 53ms so far, now at startProcess: starting to update pids map
+01-06 14:58:42.953  1342  1380 W ActivityManager: Slow operation: 53ms so far, now at startProcess: done updating pids map
+01-06 14:58:43.245  1342  2351 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:43.262  1342  5219 I ActivityManager: Killing 8040:com.google.android.cellbroadcastreceiver/u0a205 (adj 925): empty #9
+01-06 14:58:43.264  1342  1384 D ActivityManager: quick sync unfreeze 8040 for 12
+01-06 14:58:43.320  1342  6689 W ActivityManager: Unable to start service Intent { cmp=com.xiaomi.mipicks:guard/com.xiaomi.mipicks.openstore.core.process.OpenProcessProxyService (has extras) } U=0: not found
+01-06 14:58:43.496  1342  2351 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 9332, callingUid: 10130
+01-06 14:58:43.532  1342  2351 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 9332, callingUid: 10130
+01-06 14:58:44.227  1342  6689 W ActivityManager: Unable to start service Intent { act=com.google.android.gms.presencemanager.service.START pkg=com.google.android.gms } U=0: not found
+01-06 14:58:44.228  1342  2351 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@7e0875d
+01-06 14:58:44.232  1342  6689 W ActivityManager: Unable to start service Intent { act=com.google.android.gms.presencemanager.service.INTERNAL_IDENTITY pkg=com.google.android.gms } U=0: not found
+01-06 14:58:44.233  1342  6689 W ActivityManager: Unbind failed: could not find connection for android.os.BinderProxy@2c628d2
+01-06 14:58:44.818  1342  2351 I ActivityManager: Killing 8733:com.android.rkpdapp/u0a192 (adj 915): empty #9
+01-06 14:58:44.821  1342  1384 D ActivityManager: quick sync unfreeze 8733 for 12
+01-06 14:58:45.246  1342  6689 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:45.581  1342  1380 I ActivityManager: Start proc 9584:com.android.chrome:privileged_process0/u0a159 for service {com.android.chrome/org.chromium.content.app.PrivilegedProcessService0}
+01-06 14:58:45.652  1342  2351 I ActivityManager: Killing 8613:com.google.android.gms.unstable/u0a153 (adj 905): empty #9
+01-06 14:58:46.250  1342  8465 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:46.254  1342  6689 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:46.606  1342  1380 W ActivityManager: Slow operation: 195ms so far, now at startProcess: returned from zygote!
+01-06 14:58:46.607  1342  1380 W ActivityManager: Slow operation: 195ms so far, now at startProcess: done updating battery stats
+01-06 14:58:46.607  1342  1380 W ActivityManager: Slow operation: 195ms so far, now at startProcess: building log message
+01-06 14:58:46.607  1342  1380 I ActivityManager: Start proc 9654:com.android.chrome:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0ai0 for  {com.android.chrome/org.chromium.content.app.SandboxedProcessService0:0}
+01-06 14:58:46.607  1342  1380 W ActivityManager: Slow operation: 195ms so far, now at startProcess: starting to update pids map
+01-06 14:58:46.607  1342  1380 W ActivityManager: Slow operation: 195ms so far, now at startProcess: done updating pids map
+01-06 14:58:46.663  1342  8465 I ActivityManager: Killing 9121:com.google.android.apps.nbu.files/u0a229 (adj 905): empty #9
+01-06 14:58:47.252  1342  6587 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:47.255  1342  6587 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:47.309  1342  6587 D ActivityManager: getHistoricalProcessExitReasons pkg: com.android.vending, pid:  0, userId: 0, callingPid: 8968, callingUid: 10152
+01-06 14:58:47.673  1342  6689 D ActivityManager: getHistoricalProcessExitReasons pkg: com.google.android.youtube, pid:  0, userId: 0, callingPid: 8878, callingUid: 10177
+01-06 14:58:48.259  1342  6587 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:49.261  1342  6587 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:49.263  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:50.265  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:50.267  1342  6587 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:51.269  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:51.271  1342  6587 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:52.169  1342  1367 D ActivityManager: get tempetureValue is :40.0
+01-06 14:58:52.700  1342  1495 D ActivityManager: freezing 9189 com.indus.appstore
+01-06 14:58:53.211  1342  1495 D ActivityManager: freezing 8878 com.google.android.youtube
+01-06 14:58:53.687  1342  1495 D ActivityManager: freezing 9332 com.xiaomi.mipicks
+01-06 14:58:53.693  1342  6587 I ActivityManager: Killing 9189:com.indus.appstore/u0a221 (adj 905): empty #9
+01-06 14:58:53.695  1342  1384 D ActivityManager: quick sync unfreeze 9189 for 12
+01-06 14:58:53.767  1342  5219 D ActivityManager: sync unfroze 9332 com.xiaomi.mipicks for 5
+01-06 14:58:53.984  1342  5219 W ActivityManager: Background start not allowed: service Intent { pkg=com.xiaomi.mipicks cmp=com.xiaomi.mipicks/com.xiaomi.market.service.HandleTaskService (has extras) } to com.xiaomi.mipicks/com.xiaomi.market.service.HandleTaskService from pid=9332 uid=10130 pkg=com.xiaomi.mipicks startFg?=false
+01-06 14:58:54.819  1342  1495 D ActivityManager: freezing 9405 com.android.chrome
+01-06 14:58:55.654  1342  1495 D ActivityManager: freezing 9584 com.android.chrome:privileged_process0
+01-06 14:58:56.663  1342  1495 D ActivityManager: freezing 9654 com.android.chrome:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0
+01-06 14:58:57.324  1342  4308 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:58:57.526  1342  1495 D ActivityManager: freezing 8968 com.android.vending
+01-06 14:58:57.529  1342  1495 D ActivityManager: freezing 9021 com.android.vending:background
+01-06 14:59:02.367  1342  4308 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:03.943  1342  1495 D ActivityManager: freezing 9332 com.xiaomi.mipicks
+01-06 14:59:04.926  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:05.553  1342  1495 D ActivityManager: freezing 13117 com.google.android.gms
+01-06 14:59:05.928  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:07.174  1342  1367 D ActivityManager: get tempetureValue is :38.0
+01-06 14:59:16.524  1342  4308 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:17.525  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:18.527  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:19.529  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:20.531  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:21.533  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:22.178  1342  1367 D ActivityManager: get tempetureValue is :37.0
+01-06 14:59:22.535  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:26.763  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:27.765  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:28.767  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:28.769  1342  4308 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:28.860  1342  4308 W ActivityManager: pid 19788 com.google.android.gms.persistent sent binder code 1 with flags 1 to frozen apps and got error -32
+01-06 14:59:28.883  1342  1380 I ActivityManager: Start proc 9718:com.google.android.gms.unstable/u0a153 for service {com.google.android.gms/com.google.android.gms.droidguard.DroidGuardService}
+01-06 14:59:29.771  1342  5219 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:30.027  1342  1380 I ActivityManager: Start proc 9765:com.android.rkpdapp/u0a192 for service {com.android.rkpdapp/com.android.rkpdapp.service.RemoteProvisioningService}
+01-06 14:59:30.111  1342  4308 I ActivityManager: Killing 8878:com.google.android.youtube/u0a177 (adj 905): empty #9
+01-06 14:59:30.115  1342  1384 D ActivityManager: quick sync unfreeze 8878 for 12
+01-06 14:59:30.126  1342  4308 D ActivityManager: getHistoricalProcessExitReasons pkg: null, pid:  0, userId: 0, callingPid: 9765, callingUid: 10192
+01-06 14:59:30.182  1342  4308 D ActivityManager: sync unfroze 13117 com.google.android.gms for 5
+01-06 14:59:30.185  1342  4308 D ActivityManager: sync unfroze 8968 com.android.vending for 5
+01-06 14:59:30.187  1342  4308 D ActivityManager: sync unfroze 9021 com.android.vending:background for 5
+01-06 14:59:30.188  1342  4308 D ActivityManager: sync unfroze 9654 com.android.chrome:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0 for 5
+01-06 14:59:30.190  1342  4308 D ActivityManager: sync unfroze 9584 com.android.chrome:privileged_process0 for 5
+01-06 14:59:30.192  1342  4308 D ActivityManager: sync unfroze 9405 com.android.chrome for 5
+01-06 14:59:30.774  1342  2058 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:31.776  1342  2058 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:37.183  1342  1367 D ActivityManager: get tempetureValue is :37.0
+01-06 14:59:40.160  1342  1495 D ActivityManager: freezing 9765 com.android.rkpdapp
+01-06 14:59:40.364  1342  1495 D ActivityManager: freezing 9405 com.android.chrome
+01-06 14:59:40.367  1342  1495 D ActivityManager: freezing 9584 com.android.chrome:privileged_process0
+01-06 14:59:40.368  1342  1495 D ActivityManager: freezing 9654 com.android.chrome:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0
+01-06 14:59:40.621  1342  1495 D ActivityManager: freezing 8968 com.android.vending
+01-06 14:59:40.623  1342  1495 D ActivityManager: freezing 9021 com.android.vending:background
+01-06 14:59:42.123  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:43.125  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:44.127  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:45.129  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:45.506  1342  1495 D ActivityManager: freezing 9718 com.google.android.gms.unstable
+01-06 14:59:46.131  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:49.134  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:50.136  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:51.138  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:52.140  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 14:59:52.188  1342  1367 D ActivityManager: get tempetureValue is :37.0
+01-06 14:59:56.203  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:01.323  1342  2058 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:07.193  1342  1367 D ActivityManager: get tempetureValue is :36.0
+01-06 15:00:07.646  1342  3338 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:08.649  1342  3338 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:09.650  1342  3338 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:11.652  1342  3338 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:12.654  1342  3338 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:13.657  1342  3338 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:26.923  1342  2058 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }
+01-06 15:00:28.870  1342  2058 D ActivityManager: sync unfroze 9718 com.google.android.gms.unstable for 6
+01-06 15:00:29.026  1342  3338 D ActivityManager: sync unfroze 9765 com.android.rkpdapp for 6
+01-06 15:00:29.406  1342  7056 D ActivityManager: Skip enqueue broadcast because no receiver with Intent { act=android.intent.action.SIG_STR flg=0x10 (has extras) }

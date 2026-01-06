@@ -88,6 +88,7 @@ defmodule KoncallApiWeb.Router do
     live "/reports", ReportLive.Index, :index
     live "/reports/counsellors", ReportLive.Counsellors, :index
     live "/reports/counsellors/:id", ReportLive.CounsellorShow, :show
+    live "/reports/leads/:id/calls", ReportLive.LeadCalls, :show
     live "/reports/branches", ReportLive.Branches, :index
     live "/reports/universities", ReportLive.Universities, :index
     

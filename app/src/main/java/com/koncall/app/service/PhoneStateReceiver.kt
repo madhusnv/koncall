@@ -7,6 +7,7 @@ import android.content.Intent
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.provider.Settings
+import com.koncall.app.service.recording.RecordingFinderWorker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -112,24 +113,40 @@ class PhoneStateReceiver : BroadcastReceiver() {
     }
     
     /**
-     * Notify CallMonitorService that a call ended.
-     * The service will schedule the RecordingFinderWorker to discover OEM recordings.
+     * Notify that a call ended.
+     * Schedules workers to ingest log and find recording using WorkManager.
      */
     private fun notifyCallEnded(context: Context, callEndTime: Long, phoneNumber: String?, duration: Int) {
-        val intent = Intent(context, CallMonitorService::class.java).apply {
-            action = CallMonitorService.ACTION_CALL_ENDED
-            putExtra(CallMonitorService.EXTRA_CALL_END_TIME, callEndTime)
-            putExtra(CallMonitorService.EXTRA_PHONE_NUMBER, phoneNumber)
-            putExtra(CallMonitorService.EXTRA_CALL_DURATION, duration)
+        if (duration > 0) {
+            // Schedule Recording Finder
+            val inputData = androidx.work.workDataOf(
+                RecordingFinderWorker.KEY_CALL_END_TIME to callEndTime,
+                RecordingFinderWorker.KEY_PHONE_NUMBER to phoneNumber
+            )
+            
+            val finderRequest = androidx.work.OneTimeWorkRequestBuilder<RecordingFinderWorker>()
+                .setInitialDelay(30, java.util.concurrent.TimeUnit.SECONDS)
+                .setInputData(inputData)
+                .build()
+            
+            androidx.work.WorkManager.getInstance(context).enqueue(finderRequest)
+            Log.d(TAG, "Scheduled RecordingFinderWorker")
         }
-        context.startService(intent)
+        
+        // Schedule Call Log Ingestion
+        triggerCallLogIngestion(context)
     }
 
     private fun triggerCallLogSync(context: Context) {
-        // Start CallMonitorService to sync call logs
-        val serviceIntent = Intent(context, CallMonitorService::class.java).apply {
-            action = CallMonitorService.ACTION_SYNC_CALL_LOGS
-        }
-        context.startService(serviceIntent)
+        triggerCallLogIngestion(context)
+    }
+    
+    private fun triggerCallLogIngestion(context: Context) {
+        val request = androidx.work.OneTimeWorkRequestBuilder<CallLogIngestionWorker>()
+            .setInitialDelay(2, java.util.concurrent.TimeUnit.SECONDS) // Short delay to allow system log update
+            .build()
+            
+        androidx.work.WorkManager.getInstance(context).enqueue(request)
+        Log.d(TAG, "Scheduled CallLogIngestionWorker")
     }
 }

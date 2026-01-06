@@ -33,7 +33,8 @@ class RecordingFinderWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val recordingFinder: RecordingFinder,
     private val callLogDao: CallLogDao,
-    private val recordingDao: RecordingDao
+    private val recordingDao: RecordingDao,
+    private val preferencesManager: com.koncall.app.data.local.PreferencesManager
 ) : CoroutineWorker(context, params) {
     
     companion object {
@@ -56,8 +57,16 @@ class RecordingFinderWorker @AssistedInject constructor(
             
             val callEndTime = inputData.getLong(KEY_CALL_END_TIME, 0L)
             val phoneNumber = inputData.getString(KEY_PHONE_NUMBER)
-            val safFolderUriStr = inputData.getString(KEY_SAF_FOLDER_URI)
+            var safFolderUriStr = inputData.getString(KEY_SAF_FOLDER_URI)
             val scanAllRecent = inputData.getBoolean(KEY_SCAN_ALL_RECENT, false)
+            
+            // If SAF URI is missing from input, try to get it from preferences
+            if (safFolderUriStr == null) {
+                safFolderUriStr = preferencesManager.getRecordingFolderUri()?.toString()
+                if (safFolderUriStr != null) {
+                    Log.d(TAG, "Using SAF URI from preferences: $safFolderUriStr")
+                }
+            }
             
             val safFolderUri = safFolderUriStr?.let { Uri.parse(it) }
             
@@ -70,6 +79,11 @@ class RecordingFinderWorker @AssistedInject constructor(
             }
             
             Log.d(TAG, "Recording finder complete: found=$found, matched=$matched")
+            
+            // If we matched any recordings, trigger upload immediately
+            if (matched > 0) {
+                triggerUploadWorker()
+            }
             
             Result.success(
                 workDataOf(
@@ -87,6 +101,23 @@ class RecordingFinderWorker @AssistedInject constructor(
             }
         }
     }
+
+    private fun triggerUploadWorker() {
+        try {
+            val request = androidx.work.OneTimeWorkRequestBuilder<RecordingUploadWorker>()
+                .setConstraints(
+                    androidx.work.Constraints.Builder()
+                        .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                        .build()
+                )
+                .build()
+            
+            androidx.work.WorkManager.getInstance(context).enqueue(request)
+            Log.d(TAG, "Triggered RecordingUploadWorker")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to trigger upload worker", e)
+        }
+    }
     
     /**
      * Scan for a recording that matches a specific call
@@ -96,7 +127,8 @@ class RecordingFinderWorker @AssistedInject constructor(
         phoneNumber: String?,
         safFolderUri: Uri?
     ): Pair<Int, Int> {
-        val startTime = callEndTime - 5000 // 5 seconds before
+        // Widen search window: check 2 minutes before call end to catch early writes
+        val startTime = callEndTime - 120_000 
         val endTime = callEndTime + SINGLE_CALL_WINDOW_MS
         
         // Find recordings in time window

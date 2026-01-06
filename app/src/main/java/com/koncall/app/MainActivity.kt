@@ -54,6 +54,9 @@ class MainActivity : ComponentActivity() {
         // Request permissions on app start
         requestRequiredPermissions()
         
+        // Start CallMonitorService to ensure recording logic is active
+        startCallMonitorService()
+        
         // Determine start destination based on auth state
         val isLoggedIn = runBlocking { tokenManager.getToken() != null }
         val startDestination = if (isLoggedIn) Screen.Dashboard.route else Screen.OrgCode.route
@@ -115,6 +118,17 @@ class MainActivity : ComponentActivity() {
         
         if (permissionsToRequest.isNotEmpty()) {
             permissionLauncher.launch(permissionsToRequest)
+        }
+    }
+
+    private fun startCallMonitorService() {
+        val intent = android.content.Intent(this, com.koncall.app.service.CallMonitorService::class.java).apply {
+            action = com.koncall.app.service.CallMonitorService.ACTION_START_FOREGROUND
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
         }
     }
 }

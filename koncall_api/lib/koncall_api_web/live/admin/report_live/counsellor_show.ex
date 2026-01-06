@@ -156,12 +156,13 @@ defmodule KoncallApiWeb.Admin.ReportLive.CounsellorShow do
                     <th class="text-center">Total Calls</th>
                     <th class="text-center">Total Duration</th>
                     <th>Last Call Time</th>
+                    <th class="text-center">Call History</th>
                   </tr>
                 </thead>
                 <tbody>
                   <%= if Enum.empty?(@leads_stats) do %>
                     <tr>
-                      <td colspan="6" class="text-center py-12" style="color: var(--color-text-muted);">
+                      <td colspan="7" class="text-center py-12" style="color: var(--color-text-muted);">
                         No assigned leads found for this counsellor.
                       </td>
                     </tr>
@@ -185,6 +186,11 @@ defmodule KoncallApiWeb.Admin.ReportLive.CounsellorShow do
                         </td>
                         <td class="text-center font-semibold"><%= format_duration(item.total_duration) %></td>
                         <td style="color: var(--color-text-muted);"><%= format_datetime(item.last_call_at) %></td>
+                        <td class="text-center">
+                          <.link navigate={"/admin/reports/leads/#{item.lead.id}/calls"} class="btn btn-ghost btn-sm">
+                            <.icon name="hero-play-circle" class="w-5 h-5" style="color: var(--color-primary);" />
+                          </.link>
+                        </td>
                       </tr>
                     <% end %>
                   <% end %>

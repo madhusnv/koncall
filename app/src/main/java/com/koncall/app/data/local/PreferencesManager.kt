@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -169,12 +170,11 @@ class PreferencesManager @Inject constructor(
      * Get recording folder as URI (for SAF access)
      */
     suspend fun getRecordingFolderUri(): Uri? {
-        var uri: Uri? = null
-        dataStore.data.collect { preferences ->
-            val uriString = preferences[RECORDING_FOLDER_URI]
-            uri = uriString?.let { Uri.parse(it) }
-        }
-        return uri
+        val preferences = dataStore.data.catch { exception ->
+            if (exception is IOException) emit(emptyPreferences()) else throw exception
+        }.first()
+        val uriString = preferences[RECORDING_FOLDER_URI]
+        return uriString?.let { Uri.parse(it) }
     }
     
     /**

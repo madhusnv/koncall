@@ -43,7 +43,10 @@ interface KonCallApiService {
     
     @Multipart
     @POST("api/recordings/upload")
-    suspend fun uploadRecording(@Part file: okhttp3.MultipartBody.Part): Response<UploadResponse>
+    suspend fun uploadRecording(
+        @Part file: okhttp3.MultipartBody.Part,
+        @Part("call_log_id") callLogId: okhttp3.RequestBody
+    ): Response<UploadResponse>
     
     // ==================
     // Leads
