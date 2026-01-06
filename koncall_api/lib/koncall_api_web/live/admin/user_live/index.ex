@@ -14,7 +14,7 @@ defmodule KoncallApiWeb.Admin.UserLive.Index do
   end
 
   @impl true
-  @impl true
+
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
@@ -205,7 +205,7 @@ defmodule KoncallApiWeb.Admin.UserLive.Index do
   defp role_badge("counsellor"), do: "badge-success"
   defp role_badge(_), do: ""
 
-  defp get_branch_name(branches, nil), do: "-"
+  defp get_branch_name(_branches, nil), do: "-"
   defp get_branch_name(branches, id) do
     case Enum.find(branches, & &1.id == id) do
       nil -> "-"

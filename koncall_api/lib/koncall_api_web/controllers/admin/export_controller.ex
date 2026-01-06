@@ -39,7 +39,7 @@ defmodule KoncallApiWeb.Admin.ExportController do
     
     # For simplicity, export org-level call logs (admin view)
     # In production, you'd want to scope this better
-    date_range = parse_date_range(params)
+    _date_range = parse_date_range(params)
     
     logs = CallTracking.list_call_logs(user.id, params |> Map.put("per_page", "10000"))
     

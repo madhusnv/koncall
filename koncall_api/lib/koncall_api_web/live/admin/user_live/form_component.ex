@@ -112,8 +112,8 @@ defmodule KoncallApiWeb.Admin.UserLive.FormComponent do
 
   defp save_user(socket, :edit, user_params) do
     case Accounts.update_user(socket.assigns.user, user_params) do
-      {:ok, _user} ->
-        notify_parent({:saved, _user})
+      {:ok, user} ->
+        notify_parent({:saved, user})
 
         {:noreply,
          socket
@@ -129,8 +129,8 @@ defmodule KoncallApiWeb.Admin.UserLive.FormComponent do
     params = Map.put(user_params, "organization_id", socket.assigns.current_user.organization_id)
 
     case Accounts.create_user(params) do
-      {:ok, _user} ->
-        notify_parent({:saved, _user})
+      {:ok, user} ->
+        notify_parent({:saved, user})
 
         {:noreply,
          socket

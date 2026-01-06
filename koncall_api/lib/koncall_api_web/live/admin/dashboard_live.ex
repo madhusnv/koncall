@@ -63,14 +63,7 @@ defmodule KoncallApiWeb.Admin.DashboardLive do
     if hours > 0, do: "#{hours}h #{mins}m", else: "#{mins}m"
   end
 
-  defp stage_color("new"), do: "bg-blue-500"
-  defp stage_color("contacted"), do: "bg-yellow-500"
-  defp stage_color("interested"), do: "bg-green-500"
-  defp stage_color("application_submitted"), do: "bg-purple-500"
-  defp stage_color("documents_collected"), do: "bg-indigo-500"
-  defp stage_color("enrolled"), do: "bg-teal-500"
-  defp stage_color("joined"), do: "bg-emerald-600"
-  defp stage_color(_), do: "bg-gray-500"
+
 
   defp stage_label("new"), do: "New"
   defp stage_label("contacted"), do: "Contacted"

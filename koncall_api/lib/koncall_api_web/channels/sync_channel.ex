@@ -2,7 +2,6 @@ defmodule KoncallApiWeb.SyncChannel do
   use Phoenix.Channel
 
   alias KoncallApi.CallTracking
-  alias KoncallApi.CallTracking.CallLog
 
   @impl true
   def join("sync:" <> device_id, _params, socket) do

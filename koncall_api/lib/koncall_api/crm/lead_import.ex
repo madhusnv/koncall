@@ -3,9 +3,7 @@ defmodule KoncallApi.CRM.LeadImport do
   Handles CSV import of leads with round-robin distribution to callers.
   """
   alias KoncallApi.CRM
-  alias KoncallApi.CRM.Lead
-  alias KoncallApi.Repo
-  alias NimbleCSV.RFC4180, as: CSV
+  alias KoncallApi.CRM
 
   @doc """
   Import leads from CSV content with round-robin distribution to specified users.

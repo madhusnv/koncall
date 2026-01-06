@@ -151,31 +151,4 @@ defmodule KoncallApi.Analytics do
     |> where([c], c.call_datetime >= ^DateTime.new!(start_date, ~T[00:00:00]))
     |> where([c], c.call_datetime <= ^DateTime.new!(end_date, ~T[23:59:59]))
   end
-
-  defp count_by_type(query, type) do
-    query
-    |> where([c], c.call_type == ^type)
-    |> Repo.aggregate(:count)
-  end
-
-  defp count_unique_contacts(query) do
-    query
-    |> select([c], c.phone_number)
-    |> distinct(true)
-    |> Repo.aggregate(:count)
-  end
-
-  defp count_connected(query) do
-    query
-    |> where([c], c.duration > 0)
-    |> Repo.aggregate(:count)
-  end
-
-  defp calculate_avg_duration(query) do
-    connected = query |> where([c], c.duration > 0)
-    total = Repo.aggregate(connected, :sum, :duration) || 0
-    count = Repo.aggregate(connected, :count)
-
-    if count > 0, do: div(total, count), else: 0
-  end
 end

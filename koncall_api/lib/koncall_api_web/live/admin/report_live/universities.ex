@@ -1,6 +1,6 @@
 defmodule KoncallApiWeb.Admin.ReportLive.Universities do
   use KoncallApiWeb, :live_view
-  alias KoncallApi.{Accounts, Universities, CRM}
+  alias KoncallApi.{Accounts, Universities}
   alias KoncallApi.CRM.Lead
   alias KoncallApi.Repo
   import Ecto.Query

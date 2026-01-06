@@ -1,6 +1,6 @@
 defmodule KoncallApiWeb.Admin.ReportLive.Counsellors do
   use KoncallApiWeb, :live_view
-  alias KoncallApi.{Accounts, Branches, CRM}
+  alias KoncallApi.{Accounts, CRM}
 
   @per_page 10
 

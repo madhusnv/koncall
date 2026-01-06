@@ -102,8 +102,9 @@ defmodule KoncallApiWeb.Admin.LeadLive.Import do
     # But using assigns is safer if we want to trust current state.
     # However, let's look at the form structure.
     
-    consume_uploaded_entries(socket, :csv, fn %{path: path}, _entry ->
+    consume_uploaded_entries(socket, :csv, fn %{path: _path}, _entry ->
        # ...
+       {:ok, :todo}
     end)
     # ...
   end

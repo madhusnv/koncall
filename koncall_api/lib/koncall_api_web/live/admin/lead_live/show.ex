@@ -1,6 +1,6 @@
 defmodule KoncallApiWeb.Admin.LeadLive.Show do
   use KoncallApiWeb, :live_view
-  alias KoncallApi.{CRM, Accounts, CallTracking}
+  alias KoncallApi.{CRM, Accounts}
   alias KoncallApi.CRM.Lead
 
   @impl true
