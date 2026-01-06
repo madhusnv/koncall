@@ -71,8 +71,10 @@ class SyncWorker @AssistedInject constructor(
             if (response.isSuccessful) {
                 val result = response.body()?.data
                 var hasRecordingsToUpload = false
+                var hasSyncedCalls = false
                 
                 result?.synced?.forEach { syncedLog ->
+                    hasSyncedCalls = true
                     // Find local log by device call id and mark as synced
                     val localLog = callLogDao.getCallLogByDeviceId(syncedLog.deviceCallId)
                     localLog?.let {
@@ -89,6 +91,12 @@ class SyncWorker @AssistedInject constructor(
                             hasRecordingsToUpload = true
                         }
                     }
+                }
+                
+                // Always trigger RecordingFinderWorker after syncing calls to discover recordings
+                if (hasSyncedCalls) {
+                    android.util.Log.d("SyncWorker", "Triggering RecordingFinderWorker for synced calls")
+                    triggerRecordingFinder()
                 }
                 
                 // Trigger upload if any synced calls have pending recordings
@@ -123,6 +131,25 @@ class SyncWorker @AssistedInject constructor(
             android.util.Log.d("SyncWorker", "Triggered RecordingUploadWorker after sync")
         } catch (e: Exception) {
             android.util.Log.e("SyncWorker", "Failed to trigger upload worker", e)
+        }
+    }
+    
+    private fun triggerRecordingFinder() {
+        try {
+            // Schedule with short delay to allow phone to save recording
+            val finderRequest = androidx.work.OneTimeWorkRequestBuilder<com.koncall.app.service.recording.RecordingFinderWorker>()
+                .setInitialDelay(10, java.util.concurrent.TimeUnit.SECONDS)
+                .setInputData(
+                    androidx.work.workDataOf(
+                        com.koncall.app.service.recording.RecordingFinderWorker.KEY_SCAN_ALL_RECENT to true
+                    )
+                )
+                .build()
+            
+            androidx.work.WorkManager.getInstance(applicationContext).enqueue(finderRequest)
+            android.util.Log.d("SyncWorker", "Scheduled RecordingFinderWorker (10s delay)")
+        } catch (e: Exception) {
+            android.util.Log.e("SyncWorker", "Failed to trigger recording finder", e)
         }
     }
 }

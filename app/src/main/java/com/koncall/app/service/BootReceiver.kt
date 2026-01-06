@@ -3,6 +3,7 @@ package com.koncall.app.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.Log
 
 class BootReceiver : BroadcastReceiver() {
@@ -16,12 +17,20 @@ class BootReceiver : BroadcastReceiver() {
             intent.action == "android.intent.action.QUICKBOOT_POWERON") {
             Log.d(TAG, "Device booted, starting call monitor service")
             
-            // The PhoneStateReceiver will be active due to manifest registration
-            // Optionally, we can trigger an initial sync here
+            // Start service with foreground action for Android 12+ compatibility
             val serviceIntent = Intent(context, CallMonitorService::class.java).apply {
-                action = CallMonitorService.ACTION_SYNC_CALL_LOGS
+                action = CallMonitorService.ACTION_START_FOREGROUND
             }
-            context.startService(serviceIntent)
+            
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(serviceIntent)
+                } else {
+                    context.startService(serviceIntent)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start CallMonitorService on boot", e)
+            }
         }
     }
 }

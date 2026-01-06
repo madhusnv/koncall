@@ -45,6 +45,12 @@ class MainActivity : ComponentActivity() {
         permissions.entries.forEach { entry ->
             android.util.Log.d("MainActivity", "Permission ${entry.key}: ${entry.value}")
         }
+        
+        // Restart service after permissions granted to register CallLogObserver
+        if (permissions.values.any { it }) {
+            android.util.Log.d("MainActivity", "Permissions granted, restarting service")
+            startCallMonitorService()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

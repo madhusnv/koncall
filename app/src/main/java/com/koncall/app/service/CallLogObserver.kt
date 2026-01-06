@@ -51,6 +51,14 @@ class CallLogObserver @Inject constructor(
                         Log.d(TAG, "New call detected: ${latestCall.phoneNumber}")
                         callLogDao.insertCallLog(latestCall)
                         lastProcessedId = latestCall.deviceCallId
+                        
+                        // Trigger sync to backend
+                        triggerSyncWorker()
+                        
+                        // Trigger recording finder if call had duration
+                        if (latestCall.duration > 0) {
+                            triggerRecordingFinder(latestCall.callDateTime, latestCall.phoneNumber)
+                        }
                     } else {
                         Log.d(TAG, "Call already exists: ${latestCall.deviceCallId}")
                     }
@@ -59,6 +67,34 @@ class CallLogObserver @Inject constructor(
                 Log.e(TAG, "Error reading call log", e)
             }
         }
+    }
+    
+    private fun triggerSyncWorker() {
+        Log.d(TAG, "Triggering SyncWorker")
+        val constraints = androidx.work.Constraints.Builder()
+            .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+            .build()
+        
+        val syncRequest = androidx.work.OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .build()
+        
+        androidx.work.WorkManager.getInstance(context).enqueue(syncRequest)
+    }
+    
+    private fun triggerRecordingFinder(callEndTime: Long, phoneNumber: String) {
+        Log.d(TAG, "Scheduling RecordingFinderWorker for $phoneNumber")
+        val inputData = androidx.work.workDataOf(
+            com.koncall.app.service.recording.RecordingFinderWorker.KEY_CALL_END_TIME to callEndTime,
+            com.koncall.app.service.recording.RecordingFinderWorker.KEY_PHONE_NUMBER to phoneNumber
+        )
+        
+        val finderRequest = androidx.work.OneTimeWorkRequestBuilder<com.koncall.app.service.recording.RecordingFinderWorker>()
+            .setInitialDelay(30, java.util.concurrent.TimeUnit.SECONDS)
+            .setInputData(inputData)
+            .build()
+        
+        androidx.work.WorkManager.getInstance(context).enqueue(finderRequest)
     }
 
     private fun readLatestCallLog(): CallLogEntity? {

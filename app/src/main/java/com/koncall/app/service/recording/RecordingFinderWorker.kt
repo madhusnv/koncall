@@ -80,8 +80,10 @@ class RecordingFinderWorker @AssistedInject constructor(
             
             Log.d(TAG, "Recording finder complete: found=$found, matched=$matched")
             
-            // NOTE: Upload is now triggered by SyncWorker after call sync completes,
-            // ensuring serverId is available for proper linking
+            // Trigger upload if we matched any recordings
+            if (matched > 0) {
+                triggerUploadWorker()
+            }
             
             Result.success(
                 workDataOf(

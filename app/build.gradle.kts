@@ -6,6 +6,9 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
 android {
     namespace = "com.koncall.app"
     compileSdk = 36
@@ -27,7 +30,13 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.19:4000/\"")
+            val localProperties = Properties()
+            val localFile = rootProject.file("local.properties")
+            if (localFile.exists()) {
+                localProperties.load(FileInputStream(localFile))
+            }
+            val baseUrl = localProperties.getProperty("BASE_URL") ?: "http://192.168.1.19:4000/"
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         }
         release {
             isMinifyEnabled = false

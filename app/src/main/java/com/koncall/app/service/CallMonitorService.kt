@@ -152,19 +152,30 @@ class CallMonitorService : Service() {
     }
 
     private fun registerCallLogObserver() {
-        if (callLogObserver == null) {
-            callLogObserver = CallLogObserver(
-                context = this,
-                callLogDao = callLogDao,
-                handler = Handler(Looper.getMainLooper())
-            )
-            
-            contentResolver.registerContentObserver(
-                CallLog.Calls.CONTENT_URI,
-                true,
-                callLogObserver!!
-            )
-            Log.d(TAG, "CallLogObserver registered")
+        // Check for permission first
+        if (checkSelfPermission(android.Manifest.permission.READ_CALL_LOG) != 
+            android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            Log.w(TAG, "READ_CALL_LOG permission not granted, skipping observer registration")
+            return
+        }
+        
+        try {
+            if (callLogObserver == null) {
+                callLogObserver = CallLogObserver(
+                    context = this,
+                    callLogDao = callLogDao,
+                    handler = Handler(Looper.getMainLooper())
+                )
+                
+                contentResolver.registerContentObserver(
+                    CallLog.Calls.CONTENT_URI,
+                    true,
+                    callLogObserver!!
+                )
+                Log.d(TAG, "CallLogObserver registered")
+            }
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Permission denied registering CallLogObserver", e)
         }
     }
 
@@ -258,7 +269,7 @@ class CallMonitorService : Service() {
             } catch (e: Exception) {
                 Log.e(TAG, "Error syncing call logs", e)
             } finally {
-                stopSelf()
+// stopSelf() - REMOVED: Service must stay alive to listen for calls via CallLogObserver
             }
         }
     }
