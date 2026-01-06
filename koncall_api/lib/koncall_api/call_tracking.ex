@@ -48,7 +48,8 @@ defmodule KoncallApi.CallTracking do
 
   @doc "Batch sync call logs from device"
   def sync_call_logs(device_id, user_id, org_id, call_logs) when is_list(call_logs) do
-    IO.puts("[SYNC] Starting sync for #{length(call_logs)} call logs, user: #{user_id}")
+    require Logger
+    Logger.debug("[SYNC] Starting sync for #{length(call_logs)} call logs, user: #{user_id}")
 
     results = Enum.map(call_logs, fn log_attrs ->
       attrs = Map.merge(log_attrs, %{
@@ -64,10 +65,8 @@ defmodule KoncallApi.CallTracking do
 
       case existing do
         nil ->
-          IO.puts("[SYNC] Creating new call log for device_call_id: #{device_call_id}")
-          result = create_call_log(attrs)
-          IO.inspect(result, label: "[SYNC] Create result")
-          result
+          Logger.debug("[SYNC] Creating new call log for device_call_id: #{device_call_id}")
+          create_call_log(attrs)
         log ->
           {:ok, log}  # Already synced
       end
@@ -76,7 +75,7 @@ defmodule KoncallApi.CallTracking do
     synced = Enum.filter(results, &match?({:ok, _}, &1)) |> Enum.map(fn {:ok, log} -> log end)
     failed = Enum.filter(results, &match?({:error, _}, &1))
     
-    IO.puts("[SYNC] Complete: synced=#{length(synced)}, failed=#{length(failed)}")
+    Logger.debug("[SYNC] Complete: synced=#{length(synced)}, failed=#{length(failed)}")
 
     {:ok, %{synced: synced, failed: length(failed)}}
   end

@@ -6,21 +6,32 @@ defmodule KoncallApi.Analytics do
   alias KoncallApi.Repo
   alias KoncallApi.CallTracking.CallLog
 
-  @doc "Get summary statistics for a user"
+  @doc "Get summary statistics for a user - optimized single query"
   def get_summary(user_id, date_range) do
-    base_query = base_query(user_id, date_range)
+    # Single query with conditional aggregation instead of 7+ separate queries
+    result = base_query(user_id, date_range)
+    |> select([c], %{
+      total_calls: count(c.id),
+      total_duration: coalesce(sum(c.duration), 0),
+      incoming: count(fragment("CASE WHEN ? = 'incoming' THEN 1 END", c.call_type)),
+      outgoing: count(fragment("CASE WHEN ? = 'outgoing' THEN 1 END", c.call_type)),
+      missed: count(fragment("CASE WHEN ? = 'missed' THEN 1 END", c.call_type)),
+      rejected: count(fragment("CASE WHEN ? = 'rejected' THEN 1 END", c.call_type)),
+      connected_calls: count(fragment("CASE WHEN ? > 0 THEN 1 END", c.duration)),
+      connected_duration: coalesce(sum(fragment("CASE WHEN ? > 0 THEN ? END", c.duration, c.duration)), 0),
+      unique_contacts: fragment("COUNT(DISTINCT ?)", c.phone_number)
+    })
+    |> Repo.one()
 
-    %{
-      total_calls: Repo.aggregate(base_query, :count),
-      total_duration: Repo.aggregate(base_query, :sum, :duration) || 0,
-      incoming: count_by_type(base_query, "incoming"),
-      outgoing: count_by_type(base_query, "outgoing"),
-      missed: count_by_type(base_query, "missed"),
-      rejected: count_by_type(base_query, "rejected"),
-      unique_contacts: count_unique_contacts(base_query),
-      connected_calls: count_connected(base_query),
-      avg_duration: calculate_avg_duration(base_query)
-    }
+    # Calculate avg_duration from the aggregated data
+    avg_duration = if result.connected_calls > 0 do
+      div(result.connected_duration, result.connected_calls)
+    else
+      0
+    end
+
+    Map.put(result, :avg_duration, avg_duration)
+    |> Map.delete(:connected_duration)
   end
 
   @doc "Get call trends grouped by day"
