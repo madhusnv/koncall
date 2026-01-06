@@ -2,23 +2,58 @@ defmodule KoncallApiWeb.Admin.ReportLive.Counsellors do
   use KoncallApiWeb, :live_view
   alias KoncallApi.{Accounts, Branches, CRM}
 
+  @per_page 10
+
   @impl true
   def mount(_params, session, socket) do
     user_id = session["admin_user_id"]
     user = Accounts.get_user!(user_id, [:organization])
-    counsellors = load_counsellor_stats(user.organization_id)
 
-    {:ok, assign(socket, page_title: "Counsellor Reports", current_user: user, counsellors: counsellors)}
+    {:ok, assign(socket, 
+      page_title: "Counsellor Reports", 
+      current_user: user,
+      page: 1,
+      per_page: @per_page,
+      total_count: 0,
+      total_pages: 1,
+      counsellors: []
+    )}
   end
 
-  defp load_counsellor_stats(org_id) do
-    Accounts.list_users(org_id)
+  @impl true
+  def handle_params(params, _uri, socket) do
+    page = String.to_integer(params["page"] || "1")
+    {counsellors, total_count} = load_counsellor_stats(
+      socket.assigns.current_user.organization_id,
+      page,
+      @per_page
+    )
+    total_pages = max(1, ceil(total_count / @per_page))
+    
+    {:noreply, assign(socket, 
+      counsellors: counsellors,
+      page: page,
+      total_count: total_count,
+      total_pages: total_pages
+    )}
+  end
+
+  defp load_counsellor_stats(org_id, page, per_page) do
+    all_counsellors = Accounts.list_users(org_id)
     |> Enum.filter(& &1.role == "counsellor")
+    
+    total_count = length(all_counsellors)
+    
+    paginated = all_counsellors
+    |> Enum.drop((page - 1) * per_page)
+    |> Enum.take(per_page)
     |> Enum.map(fn u ->
       stats = CRM.get_stage_stats(:counsellor, u.id)
       total = stats |> Map.values() |> Enum.sum()
       %{user: u, stats: stats, total_leads: total}
     end)
+    
+    {paginated, total_count}
   end
 
   @impl true
@@ -148,6 +183,53 @@ defmodule KoncallApiWeb.Admin.ReportLive.Counsellors do
                   <% end %>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <%!-- Pagination --%>
+          <div class="flex items-center justify-between mt-6">
+            <div class="text-sm" style="color: var(--color-text-muted);">
+              Showing <%= (@page - 1) * @per_page + 1 %>-<%= min(@page * @per_page, @total_count) %> of <%= @total_count %> counsellors
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <%= if @page > 1 do %>
+                <.link patch={"?page=#{@page - 1}"} class="btn btn-secondary">
+                  <.icon name="hero-chevron-left" class="w-4 h-4" />
+                  Previous
+                </.link>
+              <% else %>
+                <button disabled class="btn btn-secondary opacity-50 cursor-not-allowed">
+                  <.icon name="hero-chevron-left" class="w-4 h-4" />
+                  Previous
+                </button>
+              <% end %>
+              
+              <div class="flex items-center gap-1">
+                <%= for page_num <- max(1, @page - 2)..min(@total_pages, @page + 2) do %>
+                  <%= if page_num == @page do %>
+                    <span class="px-3 py-2 rounded-lg font-semibold" style="background: var(--color-primary); color: white;">
+                      <%= page_num %>
+                    </span>
+                  <% else %>
+                    <.link patch={"?page=#{page_num}"} class="px-3 py-2 rounded-lg hover:bg-[var(--color-bg-secondary)]" style="color: var(--color-text-primary);">
+                      <%= page_num %>
+                    </.link>
+                  <% end %>
+                <% end %>
+              </div>
+              
+              <%= if @page < @total_pages do %>
+                <.link patch={"?page=#{@page + 1}"} class="btn btn-secondary">
+                  Next
+                  <.icon name="hero-chevron-right" class="w-4 h-4" />
+                </.link>
+              <% else %>
+                <button disabled class="btn btn-secondary opacity-50 cursor-not-allowed">
+                  Next
+                  <.icon name="hero-chevron-right" class="w-4 h-4" />
+                </button>
+              <% end %>
             </div>
           </div>
         </main>

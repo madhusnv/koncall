@@ -2,13 +2,51 @@ defmodule KoncallApiWeb.Admin.ReportLive.CounsellorShow do
   use KoncallApiWeb, :live_view
   alias KoncallApi.{Accounts, CRM}
 
+  @per_page 15
+
   @impl true
   def mount(%{"id" => id}, _session, socket) do
     counsellor = Accounts.get_user!(id)
-    # Fetch leads with stats
-    leads_with_stats = CRM.get_counsellor_lead_stats(counsellor.id)
 
-    {:ok, assign(socket, page_title: "Counsellor Report: #{counsellor.name}", counsellor: counsellor, leads_stats: leads_with_stats)}
+    {:ok, assign(socket, 
+      page_title: "Counsellor Report: #{counsellor.name}", 
+      counsellor: counsellor,
+      counsellor_id: id,
+      page: 1,
+      per_page: @per_page,
+      total_count: 0,
+      total_pages: 1,
+      leads_stats: []
+    )}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket) do
+    page = String.to_integer(params["page"] || "1")
+    {leads_stats, total_count} = load_leads_paginated(
+      socket.assigns.counsellor_id,
+      page,
+      @per_page
+    )
+    total_pages = max(1, ceil(total_count / @per_page))
+    
+    {:noreply, assign(socket, 
+      leads_stats: leads_stats,
+      page: page,
+      total_count: total_count,
+      total_pages: total_pages
+    )}
+  end
+
+  defp load_leads_paginated(counsellor_id, page, per_page) do
+    all_leads = CRM.get_counsellor_lead_stats(counsellor_id)
+    total_count = length(all_leads)
+    
+    paginated = all_leads
+    |> Enum.drop((page - 1) * per_page)
+    |> Enum.take(per_page)
+    
+    {paginated, total_count}
   end
 
   @impl true
@@ -154,6 +192,55 @@ defmodule KoncallApiWeb.Admin.ReportLive.CounsellorShow do
               </table>
             </div>
           </div>
+
+          <%!-- Pagination --%>
+          <%= if @total_count > 0 do %>
+            <div class="flex items-center justify-between mt-6">
+              <div class="text-sm" style="color: var(--color-text-muted);">
+                Showing <%= (@page - 1) * @per_page + 1 %>-<%= min(@page * @per_page, @total_count) %> of <%= @total_count %> leads
+              </div>
+              
+              <div class="flex items-center gap-2">
+                <%= if @page > 1 do %>
+                  <.link patch={"?page=#{@page - 1}"} class="btn btn-secondary">
+                    <.icon name="hero-chevron-left" class="w-4 h-4" />
+                    Previous
+                  </.link>
+                <% else %>
+                  <button disabled class="btn btn-secondary opacity-50 cursor-not-allowed">
+                    <.icon name="hero-chevron-left" class="w-4 h-4" />
+                    Previous
+                  </button>
+                <% end %>
+                
+                <div class="flex items-center gap-1">
+                  <%= for page_num <- max(1, @page - 2)..min(@total_pages, @page + 2) do %>
+                    <%= if page_num == @page do %>
+                      <span class="px-3 py-2 rounded-lg font-semibold" style="background: var(--color-primary); color: white;">
+                        <%= page_num %>
+                      </span>
+                    <% else %>
+                      <.link patch={"?page=#{page_num}"} class="px-3 py-2 rounded-lg hover:bg-[var(--color-bg-secondary)]" style="color: var(--color-text-primary);">
+                        <%= page_num %>
+                      </.link>
+                    <% end %>
+                  <% end %>
+                </div>
+                
+                <%= if @page < @total_pages do %>
+                  <.link patch={"?page=#{@page + 1}"} class="btn btn-secondary">
+                    Next
+                    <.icon name="hero-chevron-right" class="w-4 h-4" />
+                  </.link>
+                <% else %>
+                  <button disabled class="btn btn-secondary opacity-50 cursor-not-allowed">
+                    Next
+                    <.icon name="hero-chevron-right" class="w-4 h-4" />
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
         </main>
       </div>
     </div>
