@@ -90,4 +90,7 @@ USER nobody
 #  && apt-get clean && rm -f /var/lib/apt/lists/*_*
 # ENTRYPOINT ["/usr/bin/tini", "--"]
 
+# ensure the server script is executable
+RUN chmod +x /app/bin/server
+
 CMD ["/app/bin/server"]
