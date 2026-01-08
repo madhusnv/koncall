@@ -1,0 +1,7 @@
+_build
+/deps
+/.git
+/priv/static/assets
+test
+ignore_test
+tmp
