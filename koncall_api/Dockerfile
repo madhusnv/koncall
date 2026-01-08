@@ -90,4 +90,4 @@ USER nobody
 #  && apt-get clean && rm -f /var/lib/apt/lists/*_*
 # ENTRYPOINT ["/usr/bin/tini", "--"]
 
-CMD ["/app/bin/koncall_api", "start"]
+CMD ["/app/bin/server"]
