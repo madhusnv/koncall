@@ -13,7 +13,7 @@ IO.puts "Creating Admin User..."
 {:ok, _admin} = Accounts.create_user(%{
   name: "Admin User",
   phone: "9948054840",
-  password: "password123",
+  password: "Snv@#321madhu",
   role: "admin",
   organization_id: org.id
 })
