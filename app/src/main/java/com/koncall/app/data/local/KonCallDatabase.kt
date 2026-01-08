@@ -19,11 +19,8 @@ import com.koncall.app.data.local.entity.RecordingEntity
         LeadEntity::class,
         RecordingEntity::class
     ],
-    version = 4,
-    exportSchema = true,
-    autoMigrations = [
-        AutoMigration(from = 3, to = 4)
-    ]
+    version = 5,
+    exportSchema = true
 )
 abstract class KonCallDatabase : RoomDatabase() {
     abstract fun callLogDao(): CallLogDao

@@ -94,9 +94,10 @@ object CallLogReader {
     }
     
     /**
-     * Map Android call type constant to our CallType string
+     * Map Android call type constant to our CallType string.
+     * Shared utility - also used by CallLogObserver.
      */
-    private fun mapCallType(type: Int): String {
+    fun mapCallType(type: Int): String {
         return when (type) {
             CallLog.Calls.INCOMING_TYPE -> CallType.INCOMING
             CallLog.Calls.OUTGOING_TYPE -> CallType.OUTGOING
@@ -107,9 +108,12 @@ object CallLogReader {
     }
     
     /**
-     * Extract SIM slot number from phone account ID
+     * Extract SIM slot number from phone account ID.
+     * Shared utility - also used by CallLogObserver.
+     * 
+     * Format varies by device, common patterns: "0", "1", "sim1", "sim2"
      */
-    private fun extractSimSlot(phoneAccountId: String?): Int? {
+    fun extractSimSlot(phoneAccountId: String?): Int? {
         if (phoneAccountId.isNullOrBlank()) return null
         return when {
             phoneAccountId.contains("0") || phoneAccountId.lowercase().contains("sim1") -> 0

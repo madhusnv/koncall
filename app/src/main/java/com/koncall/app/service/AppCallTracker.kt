@@ -37,7 +37,8 @@ class AppCallTracker @Inject constructor(
         private const val CALL_MATCH_WINDOW_MS = 60_000L // 60 seconds window to match call
     }
     
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val parentJob = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + parentJob)
     
     // Currently pending call (waiting for completion)
     private var pendingCall: PendingCall? = null
@@ -45,6 +46,17 @@ class AppCallTracker @Inject constructor(
     // Tracking state
     private val _isCallActive = MutableStateFlow(false)
     val isCallActive: StateFlow<Boolean> = _isCallActive
+    
+    /**
+     * Cleanup resources when the tracker is no longer needed.
+     * Should be called when the application is being destroyed.
+     */
+    fun cleanup() {
+        Log.d(TAG, "Cleaning up AppCallTracker")
+        parentJob.cancel()
+        pendingCall = null
+        _isCallActive.value = false
+    }
     
     data class PendingCall(
         val leadId: String,

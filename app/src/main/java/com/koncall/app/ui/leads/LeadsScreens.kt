@@ -2,7 +2,6 @@ package com.koncall.app.ui.leads
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -42,19 +41,9 @@ fun LeadsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    var showMenu by remember { mutableStateOf(false) }
     var selectedStage by remember { mutableStateOf<String?>(null) }
     var searchQuery by remember { mutableStateOf("") }
     var selectedDateFilter by remember { mutableStateOf<DateFilter>(DateFilter.ALL) }
-    
-    // File picker for CSV import
-    val csvPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.importLeadsFromCsv(context.contentResolver, it)
-        }
-    }
     
     // Filter leads by stage, search query, and date
     val filteredLeads = remember(uiState.leads, selectedStage, searchQuery, selectedDateFilter) {
@@ -85,77 +74,7 @@ fun LeadsScreen(
             }
     }
     
-    // Import result dialog
-    if (uiState.importState.isComplete || uiState.importState.error != null) {
-        AlertDialog(
-            onDismissRequest = { viewModel.clearImportState() },
-            title = { 
-                Text(
-                    if (uiState.importState.error != null) "Import Failed" 
-                    else "Import Complete",
-                    color = KonCallColors.TextPrimary
-                ) 
-            },
-            text = {
-                if (uiState.importState.error != null) {
-                    Text(uiState.importState.error!!, color = KonCallColors.Error)
-                } else {
-                    Column {
-                        Text("Successfully imported ${uiState.importState.importedCount} leads", color = KonCallColors.TextPrimary)
-                        if (uiState.importState.failedCount > 0) {
-                            Text("Failed: ${uiState.importState.failedCount}", color = KonCallColors.Warning)
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { viewModel.clearImportState() }) {
-                    Text("OK", color = KonCallColors.Teal)
-                }
-            },
-            containerColor = KonCallColors.SurfaceCard,
-            titleContentColor = KonCallColors.TextPrimary,
-            textContentColor = KonCallColors.TextSecondary
-        )
-    }
-    
-    // Import progress dialog
-    if (uiState.importState.isImporting) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = { Text("Importing Leads...", color = KonCallColors.TextPrimary) },
-            text = {
-                Column {
-                    if (uiState.importState.totalRows > 0) {
-                        Text(
-                            "Processing ${uiState.importState.importedCount + uiState.importState.failedCount} of ${uiState.importState.totalRows}",
-                            color = KonCallColors.TextSecondary
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        LinearProgressIndicator(
-                            progress = { 
-                                (uiState.importState.importedCount + uiState.importState.failedCount).toFloat() / 
-                                uiState.importState.totalRows.toFloat() 
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            color = KonCallColors.Teal,
-                            trackColor = KonCallColors.SurfaceElevated
-                        )
-                    } else {
-                        Text("Reading CSV file...", color = KonCallColors.TextSecondary)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = KonCallColors.Teal,
-                            trackColor = KonCallColors.SurfaceElevated
-                        )
-                    }
-                }
-            },
-            confirmButton = { },
-            containerColor = KonCallColors.SurfaceCard
-        )
-    }
+
 
     Scaffold(
         topBar = {
@@ -170,27 +89,6 @@ fun LeadsScreen(
                 actions = {
                     IconButton(onClick = viewModel::syncLeadsFromServer) {
                         Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = KonCallColors.Teal)
-                    }
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "More", tint = KonCallColors.TextSecondary)
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false },
-                            containerColor = KonCallColors.SurfaceElevated
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Import CSV", color = KonCallColors.TextPrimary) },
-                                leadingIcon = { 
-                                    Icon(Icons.Default.Add, contentDescription = null, tint = KonCallColors.Teal) 
-                                },
-                                onClick = {
-                                    showMenu = false
-                                    csvPickerLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "*/*"))
-                                }
-                            )
-                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

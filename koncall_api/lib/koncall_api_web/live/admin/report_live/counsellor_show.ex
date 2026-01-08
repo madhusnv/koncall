@@ -269,6 +269,6 @@ defmodule KoncallApiWeb.Admin.ReportLive.CounsellorShow do
 
   defp format_datetime(nil), do: "-"
   defp format_datetime(dt) do
-    Calendar.strftime(dt, "%d %b %H:%M")
+    KoncallApiWeb.CoreComponents.format_datetime_ist(dt)
   end
 end

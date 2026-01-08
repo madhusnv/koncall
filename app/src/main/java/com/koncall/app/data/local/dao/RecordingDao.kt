@@ -48,11 +48,14 @@ interface RecordingDao {
     
     // ===== Inserts =====
     
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(recording: RecordingEntity)
     
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(recordings: List<RecordingEntity>)
+    
+    @Query("SELECT * FROM recordings WHERE uri = :uri LIMIT 1")
+    suspend fun getByUri(uri: String): RecordingEntity?
     
     // ===== Updates =====
     

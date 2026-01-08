@@ -27,16 +27,40 @@ class LeadRepository @Inject constructor(
     suspend fun getLeadByPhoneNumber(phoneNumber: String): LeadEntity? = 
         leadDao.getLeadByPhoneNumber(phoneNumber)
     
+    /**
+     * Sync all leads from server with pagination and retry logic.
+     * Fetches pages until no more data is returned.
+     */
     suspend fun syncLeadsFromServer(): Result<Int> {
         return try {
-            val response = apiService.getLeads()
-            if (response.isSuccessful) {
-                val leads = response.body()?.data?.map { it.toEntity() } ?: emptyList()
-                leadDao.insertLeads(leads)
-                Result.success(leads.size)
-            } else {
-                Result.failure(Exception("Failed to fetch leads: ${response.code()}"))
+            val allLeads = mutableListOf<LeadEntity>()
+            var page = 1
+            val pageSize = 50
+            var hasMore = true
+            
+            while (hasMore) {
+                val response = com.koncall.app.util.RetryUtils.withRetry {
+                    apiService.getLeads(page = page, perPage = pageSize)
+                }
+                
+                if (response.isSuccessful) {
+                    val pageLeads = response.body()?.data?.map { it.toEntity() } ?: emptyList()
+                    allLeads.addAll(pageLeads)
+                    
+                    // Check if we got a full page (more data likely available)
+                    hasMore = pageLeads.size >= pageSize
+                    page++
+                } else {
+                    // Non-retryable error (4xx)
+                    return Result.failure(Exception("Failed to fetch leads: ${response.code()}"))
+                }
             }
+            
+            // Insert all fetched leads
+            if (allLeads.isNotEmpty()) {
+                leadDao.insertLeads(allLeads)
+            }
+            Result.success(allLeads.size)
         } catch (e: Exception) {
             Result.failure(e)
         }

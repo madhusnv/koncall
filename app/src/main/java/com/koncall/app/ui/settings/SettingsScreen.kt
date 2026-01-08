@@ -29,12 +29,34 @@ fun SettingsScreen(
 ) {
     val isLoggingOut by viewModel.isLoggingOut.collectAsState()
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var hasPendingSync by remember { mutableStateOf(false) }
+    
+    // Check for pending sync when showing logout dialog
+    LaunchedEffect(showLogoutDialog) {
+        if (showLogoutDialog) {
+            hasPendingSync = viewModel.hasPendingSync()
+        }
+    }
 
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Logout", color = KonCallColors.TextPrimary) },
-            text = { Text("Are you sure you want to logout?", color = KonCallColors.TextSecondary) },
+            title = { 
+                Text(
+                    if (hasPendingSync) "Unsaved Data" else "Logout",
+                    color = KonCallColors.TextPrimary
+                ) 
+            },
+            text = { 
+                Text(
+                    if (hasPendingSync) {
+                        "You have call logs that haven't synced to the server yet. Logging out may result in data loss. Continue anyway?"
+                    } else {
+                        "Are you sure you want to logout?"
+                    },
+                    color = KonCallColors.TextSecondary
+                ) 
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -42,12 +64,18 @@ fun SettingsScreen(
                         viewModel.logout(onLogout)
                     }
                 ) {
-                    Text("Logout", color = KonCallColors.Error)
+                    Text(
+                        if (hasPendingSync) "Logout Anyway" else "Logout",
+                        color = KonCallColors.Error
+                    )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancel", color = KonCallColors.TextSecondary)
+                    Text(
+                        if (hasPendingSync) "Wait for Sync" else "Cancel",
+                        color = KonCallColors.TextSecondary
+                    )
                 }
             },
             containerColor = KonCallColors.SurfaceCard,
@@ -191,16 +219,6 @@ fun SettingsScreen(
                     icon = Icons.Default.Mic,
                     iconColor = KonCallColors.Teal,
                     onClick = onNavigateToRecordingSettings
-                )
-                
-                HorizontalDivider(color = KonCallColors.BackgroundDeep.copy(alpha = 0.5f))
-                
-                SettingItem(
-                    title = "Sync Settings",
-                    subtitle = "Configure auto-sync behavior",
-                    icon = Icons.Default.Refresh,
-                    iconColor = KonCallColors.Violet,
-                    onClick = { /* TODO */ }
                 )
             }
             

@@ -118,7 +118,7 @@ defmodule KoncallApiWeb.Admin.LeadLive.Show do
   defp call_type_class(_), do: "bg-gray-100 text-gray-800"
 
   defp format_datetime(nil), do: "-"
-  defp format_datetime(dt), do: Calendar.strftime(dt, "%Y-%m-%d %H:%M")
+  defp format_datetime(dt), do: KoncallApiWeb.CoreComponents.format_datetime_ist(dt)
 
   defp format_duration(nil), do: "0s"
   defp format_duration(s) when s < 60, do: "#{s}s"

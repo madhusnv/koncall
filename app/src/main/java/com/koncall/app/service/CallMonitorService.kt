@@ -192,6 +192,34 @@ class CallMonitorService : Service() {
         super.onDestroy()
     }
 
+    /**
+     * Called when the user swipes the app away from recent apps.
+     * On some OEMs (Xiaomi, Huawei, etc.), this kills the foreground service.
+     * We schedule a restart to maintain call monitoring.
+     */
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Log.w(TAG, "Task removed - scheduling service restart")
+        
+        // Schedule restart via AlarmManager for OEMs that kill services aggressively
+        val restartIntent = Intent(this, CallMonitorService::class.java).apply {
+            action = ACTION_START_FOREGROUND
+        }
+        val pendingIntent = android.app.PendingIntent.getService(
+            this,
+            1,
+            restartIntent,
+            android.app.PendingIntent.FLAG_ONE_SHOT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        val alarmManager = getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager
+        alarmManager.set(
+            android.app.AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            android.os.SystemClock.elapsedRealtime() + 1000, // Restart in 1 second
+            pendingIntent
+        )
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createNotificationChannel() {
@@ -317,27 +345,5 @@ class CallMonitorService : Service() {
         )
         
         Log.d(TAG, "Recording finder scheduled for ${RECORDING_FINDER_DELAY_SECONDS}s from now")
-    }
-    
-    /**
-     * Schedule upload of pending recordings
-     */
-    private fun scheduleRecordingUpload() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-            
-        val request = OneTimeWorkRequestBuilder<RecordingUploadWorker>()
-            .setConstraints(constraints)
-            .setInputData(workDataOf(RecordingUploadWorker.KEY_BATCH_MODE to true))
-            .build()
-            
-        WorkManager.getInstance(this).enqueueUniqueWork(
-            "recording_upload",
-            ExistingWorkPolicy.KEEP,
-            request
-        )
-        
-        Log.d(TAG, "Recording upload scheduled")
     }
 }

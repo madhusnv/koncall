@@ -25,6 +25,22 @@ class TokenManager(private val context: Context) {
         private val USER_ROLE_KEY = stringPreferencesKey("user_role")
         private val ORG_NAME_KEY = stringPreferencesKey("org_name")
     }
+    
+    /**
+     * In-memory cache of the auth token.
+     * Avoids runBlocking calls on network threads which could cause ANR.
+     * Updated when token is saved or cleared.
+     */
+    @Volatile
+    private var cachedToken: String? = null
+    
+    init {
+        // Initialize cache from DataStore on startup
+        // This runs once during DI initialization, which is safe
+        runBlocking {
+            cachedToken = context.dataStore.data.first()[TOKEN_KEY]
+        }
+    }
 
     val tokenFlow: Flow<String?> = context.dataStore.data.map { prefs ->
         prefs[TOKEN_KEY]
@@ -44,6 +60,9 @@ class TokenManager(private val context: Context) {
         userRole: String? = null,
         orgName: String? = null
     ) {
+        // Update in-memory cache first for immediate availability
+        cachedToken = token
+        
         context.dataStore.edit { prefs ->
             prefs[TOKEN_KEY] = token
             prefs[USER_ID_KEY] = userId
@@ -60,8 +79,23 @@ class TokenManager(private val context: Context) {
         return context.dataStore.data.first()[TOKEN_KEY]
     }
 
+    /**
+     * Get token synchronously from in-memory cache.
+     * This is safe to call from any thread as it doesn't block on I/O.
+     */
     fun getTokenBlocking(): String? {
-        return runBlocking { getToken() }
+        return cachedToken
+    }
+    
+    /**
+     * Update only the token (used for token refresh).
+     * Updates both in-memory cache and persistent storage.
+     */
+    suspend fun updateToken(newToken: String) {
+        cachedToken = newToken
+        context.dataStore.edit { prefs ->
+            prefs[TOKEN_KEY] = newToken
+        }
     }
 
     suspend fun getUserId(): String? {
@@ -93,6 +127,9 @@ class TokenManager(private val context: Context) {
     }
 
     suspend fun clearAuth() {
+        // Clear in-memory cache first
+        cachedToken = null
+        
         context.dataStore.edit { prefs ->
             prefs.clear()
         }

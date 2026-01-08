@@ -7,7 +7,6 @@ import android.provider.CallLog
 import android.util.Log
 import com.koncall.app.data.local.dao.CallLogDao
 import com.koncall.app.data.local.entity.CallLogEntity
-import com.koncall.app.data.local.entity.CallType
 import com.koncall.app.data.local.entity.SyncStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -129,7 +128,7 @@ class CallLogObserver @Inject constructor(
                 val deviceCallId = cursor.getLong(idIdx)
                 val phoneNumber = cursor.getString(numberIdx) ?: ""
                 val contactName = cursor.getString(nameIdx)
-                val callType = mapCallType(cursor.getInt(typeIdx))
+                val callType = CallLogReader.mapCallType(cursor.getInt(typeIdx))
                 val duration = cursor.getInt(durationIdx)
                 val callDateTime = cursor.getLong(dateIdx)
                 val simInfo = cursor.getString(simIdx)
@@ -141,33 +140,11 @@ class CallLogObserver @Inject constructor(
                     callType = callType,
                     duration = duration,
                     callDateTime = callDateTime,
-                    simSlot = extractSimSlot(simInfo),
+                    simSlot = CallLogReader.extractSimSlot(simInfo),
                     syncStatus = SyncStatus.PENDING
                 )
             }
         }
         return null
-    }
-
-    private fun mapCallType(type: Int): String {
-        return when (type) {
-            CallLog.Calls.INCOMING_TYPE -> CallType.INCOMING
-            CallLog.Calls.OUTGOING_TYPE -> CallType.OUTGOING
-            CallLog.Calls.MISSED_TYPE -> CallType.MISSED
-            CallLog.Calls.REJECTED_TYPE -> CallType.REJECTED
-            else -> CallType.INCOMING
-        }
-    }
-
-    private fun extractSimSlot(phoneAccountId: String?): Int? {
-        if (phoneAccountId.isNullOrBlank()) return null
-        
-        // Try to extract SIM slot from phone account ID
-        // Format varies by device, common patterns: "0", "1", "sim1", "sim2"
-        return when {
-            phoneAccountId.contains("0") || phoneAccountId.lowercase().contains("sim1") -> 0
-            phoneAccountId.contains("1") || phoneAccountId.lowercase().contains("sim2") -> 1
-            else -> null
-        }
     }
 }

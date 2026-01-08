@@ -165,7 +165,7 @@ defmodule KoncallApi.CRM do
           "updated_at" => now
         }
         
-        IO.inspect(attrs, label: "Import Lead Attrs") # Debug log
+
 
         create_lead(attrs)
       end)

@@ -17,7 +17,8 @@ import androidx.room.PrimaryKey
     indices = [
         Index(value = ["dateAdded"]),
         Index(value = ["matchedCallLogId"]),
-        Index(value = ["uploadStatus"])
+        Index(value = ["uploadStatus"]),
+        Index(value = ["uri"], unique = true)  // Prevent duplicate recordings
     ]
 )
 data class RecordingEntity(

@@ -133,7 +133,7 @@ fun OrgCodeScreen(
                     GradientButton(
                         onClick = {
                             if (orgCode.length >= 4) {
-                                onOrgCodeSubmit(orgCode)
+                                onOrgCodeSubmit(orgCode.trim())
                             } else {
                                 error = "Code must be at least 4 characters"
                             }

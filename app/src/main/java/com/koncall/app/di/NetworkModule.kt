@@ -5,6 +5,7 @@ import com.koncall.app.BuildConfig
 import com.koncall.app.data.remote.api.KonCallApiService
 import com.koncall.app.service.recording.RecordingFinder
 import com.koncall.app.util.AuthInterceptor
+import com.koncall.app.util.TokenAuthenticator
 import com.koncall.app.util.TokenManager
 import dagger.Module
 import dagger.Provides
@@ -36,9 +37,19 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    fun provideTokenAuthenticator(tokenManager: TokenManager): TokenAuthenticator {
+        return TokenAuthenticator(tokenManager)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)

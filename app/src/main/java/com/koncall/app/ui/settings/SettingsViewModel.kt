@@ -45,6 +45,10 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    suspend fun hasPendingSync(): Boolean {
+        return authRepository.hasPendingSync()
+    }
+
     fun logout(onLoggedOut: () -> Unit) {
         viewModelScope.launch {
             _isLoggingOut.value = true

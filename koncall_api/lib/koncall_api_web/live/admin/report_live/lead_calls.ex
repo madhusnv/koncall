@@ -189,11 +189,11 @@ defmodule KoncallApiWeb.Admin.ReportLive.LeadCalls do
 
   defp format_date(nil), do: "-"
   defp format_date(dt) do
-    Calendar.strftime(dt, "%d %b %Y")
+    KoncallApiWeb.CoreComponents.format_date_ist(dt)
   end
 
   defp format_time(nil), do: ""
   defp format_time(dt) do
-    Calendar.strftime(dt, "%H:%M")
+    KoncallApiWeb.CoreComponents.format_time_ist(dt)
   end
 end

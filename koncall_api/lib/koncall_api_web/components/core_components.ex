@@ -30,6 +30,56 @@ defmodule KoncallApiWeb.CoreComponents do
   use Gettext, backend: KoncallApiWeb.Gettext
 
   alias Phoenix.LiveView.JS
+  
+  # IST timezone offset: UTC+5:30
+  @ist_offset_hours 5
+  @ist_offset_minutes 30
+
+  @doc """
+  Formats a UTC DateTime to IST (Indian Standard Time) format.
+  Returns a human-readable string like "07 Jan 2026, 04:30 PM"
+  
+  ## Examples
+  
+      format_datetime_ist(~U[2026-01-07 10:00:00Z])
+      # => "07 Jan 2026, 03:30 PM"
+  """
+  def format_datetime_ist(nil), do: "-"
+  def format_datetime_ist(datetime) when is_struct(datetime, DateTime) do
+    datetime
+    |> DateTime.add(@ist_offset_hours * 3600 + @ist_offset_minutes * 60, :second)
+    |> Calendar.strftime("%d %b %Y, %I:%M %p IST")
+  end
+  def format_datetime_ist(datetime) when is_struct(datetime, NaiveDateTime) do
+    datetime
+    |> NaiveDateTime.add(@ist_offset_hours * 3600 + @ist_offset_minutes * 60, :second)
+    |> NaiveDateTime.to_string()
+    |> String.slice(0..15)
+    |> Kernel.<>(" IST")
+  end
+  
+  @doc """
+  Formats a date to IST format (date only, no time).
+  """
+  def format_date_ist(nil), do: "-"
+  def format_date_ist(datetime) when is_struct(datetime, DateTime) do
+    datetime
+    |> DateTime.add(@ist_offset_hours * 3600 + @ist_offset_minutes * 60, :second)
+    |> Calendar.strftime("%d %b %Y")
+  end
+  def format_date_ist(date) when is_struct(date, Date) do
+    Calendar.strftime(date, "%d %b %Y")
+  end
+  
+  @doc """
+  Formats time only in IST.
+  """
+  def format_time_ist(nil), do: "-"
+  def format_time_ist(datetime) when is_struct(datetime, DateTime) do
+    datetime
+    |> DateTime.add(@ist_offset_hours * 3600 + @ist_offset_minutes * 60, :second)
+    |> Calendar.strftime("%I:%M %p")
+  end
 
   @doc """
   Renders flash notices.

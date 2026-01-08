@@ -142,12 +142,7 @@ class RecordingFinderWorker @AssistedInject constructor(
         }
         
         // Save discovered recordings to database
-        discoveries.forEach { discovery ->
-            val existing = recordingDao.getById(discovery.id)
-            if (existing == null) {
-                recordingDao.insert(discovery.toEntity())
-            }
-        }
+        saveDiscoveredRecordings(discoveries)
         
         // Get the call that triggered this search
         val calls = callLogDao.getCallsWithoutRecording(startTime, endTime)
@@ -156,17 +151,33 @@ class RecordingFinderWorker @AssistedInject constructor(
         }
         
         // Convert discoveries to RecordingInfo for matching
-        val recordingInfos = discoveries.map { d ->
-            RecordingMatcher.RecordingInfo(
-                id = d.id,
-                fileName = d.fileName,
-                dateAdded = d.dateAdded,
-                size = d.size
-            )
+        // CRITICAL: Filter out recordings that are already matched to prevent duplicates
+        val unmatchedRecordingInfos = discoveries.mapNotNull { d ->
+            // Check if this recording is already linked to a call
+            val exists = recordingDao.getById(d.id)
+            if (exists?.matchedCallLogId != null) {
+                Log.d(TAG, "Skipping already-matched recording: ${d.fileName} (linked to call ${exists.matchedCallLogId})")
+                null  // Skip this recording
+            } else {
+                // Recording is not matched yet, include it
+                RecordingMatcher.RecordingInfo(
+                    id = d.id,
+                    fileName = d.fileName,
+                    dateAdded = d.dateAdded,
+                    size = d.size
+                )
+            }
         }
         
+        if (unmatchedRecordingInfos.isEmpty()) {
+            Log.d(TAG, "All ${discoveries.size} recordings are already matched, skipping matcher")
+            return Pair(discoveries.size, 0)
+        }
+        
+        Log.d(TAG, "Running matcher on ${unmatchedRecordingInfos.size} unmatched recordings (${discoveries.size - unmatchedRecordingInfos.size} were already matched)")
+        
         // Run matching algorithm
-        val matches = RecordingMatcher.findMatches(calls, recordingInfos)
+        val matches = RecordingMatcher.findMatches(calls, unmatchedRecordingInfos)
         
         // Update database with matches
         var matchedCount = 0
@@ -220,12 +231,7 @@ class RecordingFinderWorker @AssistedInject constructor(
         }
         
         // Save discovered recordings
-        discoveries.forEach { discovery ->
-            val existing = recordingDao.getById(discovery.id)
-            if (existing == null) {
-                recordingDao.insert(discovery.toEntity())
-            }
-        }
+        saveDiscoveredRecordings(discoveries)
         
         // Get all unmatched calls that could have recordings
         val calls = callLogDao.getRecentCallsNeedingRecording(50)
@@ -277,5 +283,18 @@ class RecordingFinderWorker @AssistedInject constructor(
         }
         
         return Pair(discoveries.size, matchedCount)
+    }
+    
+    /**
+     * Save discovered recordings to database (skip if already exists).
+     * Helper method to avoid code duplication.
+     */
+    private suspend fun saveDiscoveredRecordings(discoveries: List<RecordingFinder.DiscoveredRecording>) {
+        discoveries.forEach { discovery ->
+            val existing = recordingDao.getById(discovery.id)
+            if (existing == null) {
+                recordingDao.insert(discovery.toEntity())
+            }
+        }
     }
 }

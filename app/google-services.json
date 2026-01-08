@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "921145204570",
+    "project_id": "koncall",
+    "storage_bucket": "koncall.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:921145204570:android:fb662919a1546d11111d63",
+        "android_client_info": {
+          "package_name": "com.koncall.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrDNsOoOsJJhYXZwF9tuMUQ3TLRNaQek4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
