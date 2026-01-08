@@ -7,11 +7,12 @@ services:
     env_file:
       - .env.prod
     ports:
-      - "4001:4001"
+      - "4001:4000"
     depends_on:
       - db
     networks:
       - default
+      - koncrm_default
 
   db:
     image: postgres:16-alpine
@@ -33,3 +34,7 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  koncrm_default:
+    external: true
