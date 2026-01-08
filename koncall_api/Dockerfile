@@ -43,14 +43,14 @@ RUN mix deps.compile
 COPY config/config.exs config/${MIX_ENV}.exs config/
 COPY config/runtime.exs config/
 
+# compile code first to extract colocated JS (LiveView 1.1+)
+COPY lib lib
+RUN mix compile
+
 # compile assets
 COPY priv priv
 COPY assets assets
 RUN mix assets.deploy
-
-# Compile the release
-COPY lib lib
-RUN mix compile
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
