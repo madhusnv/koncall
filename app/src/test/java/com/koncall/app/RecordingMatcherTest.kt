@@ -144,4 +144,115 @@ class RecordingMatcherTest {
         assertNotNull(match)
         assertEquals("good", match?.recording?.id)
     }
+
+    // ==================
+    // Additional Edge Case Tests
+    // ==================
+
+    @Test
+    fun normalizePhoneNumber_internationalFormats() {
+        // UK number
+        assertEquals("7912345678", RecordingMatcher.normalizePhoneNumber("+44 7912 345678"))
+        // US number
+        assertEquals("2025551234", RecordingMatcher.normalizePhoneNumber("+1 (202) 555-1234"))
+        // Indian number with 0 prefix
+        assertEquals("9876543210", RecordingMatcher.normalizePhoneNumber("09876543210"))
+    }
+
+    @Test
+    fun normalizePhoneNumber_emptyAndNull() {
+        assertEquals("", RecordingMatcher.normalizePhoneNumber(""))
+        assertEquals("", RecordingMatcher.normalizePhoneNumber("   "))
+    }
+
+    @Test
+    fun filenameContainsName_nullOrEmptyName() {
+        assertFalse(RecordingMatcher.filenameContainsName("Call_123.m4a", null))
+        assertFalse(RecordingMatcher.filenameContainsName("Call_123.m4a", ""))
+        assertFalse(RecordingMatcher.filenameContainsName("Call_123.m4a", "   "))
+    }
+
+    @Test
+    fun filenameContainsName_specialCharacters() {
+        // Name with unicode characters
+        assertTrue(RecordingMatcher.filenameContainsName("Call_Müller_2024.m4a", "Müller"))
+        // Name with apostrophe
+        assertTrue(RecordingMatcher.filenameContainsName("Call_O'Brien_2024.m4a", "O'Brien"))
+    }
+
+    @Test
+    fun findBestMatch_emptyRecordingsList_returnsNull() {
+        val call = CallLogEntity(
+            id = "call_1",
+            deviceCallId = 1003L,
+            phoneNumber = "9876543210",
+            contactName = "Test",
+            callType = "incoming",
+            callDateTime = System.currentTimeMillis(),
+            duration = 10
+        )
+        
+        val match = RecordingMatcher.findBestMatch(call, emptyList())
+        
+        assertEquals(null, match)
+    }
+
+    @Test
+    fun findBestMatch_allBelowThreshold_returnsNull() {
+        val now = System.currentTimeMillis()
+        val call = CallLogEntity(
+            id = "call_1",
+            deviceCallId = 1004L,
+            phoneNumber = "9876543210",
+            contactName = "John",
+            callType = "incoming",
+            callDateTime = now,
+            duration = 10
+        )
+        
+        // Recording that's way too old - should score 0
+        val oldRecording = RecordingMatcher.RecordingInfo(
+            id = "old",
+            fileName = "unrelated.m4a",
+            dateAdded = now - 120000, // 2 minutes ago
+            size = 1000
+        )
+        
+        val match = RecordingMatcher.findBestMatch(call, listOf(oldRecording))
+        
+        // Should be null since score is below threshold
+        assertEquals(null, match)
+    }
+
+    @Test
+    fun isRecordingAfterCallEnd_withinBuffer_returnsTrue() {
+        val callTime = 1000000L
+        val duration = 60 // 60 second call
+        val callEnd = callTime + (duration * 1000L) // callTime + 60000
+        
+        // Recording 1 second after call ended
+        assertTrue(RecordingMatcher.isRecordingAfterCallEnd(callEnd + 1000, callTime, duration))
+        
+        // Recording exactly at call end
+        assertTrue(RecordingMatcher.isRecordingAfterCallEnd(callEnd, callTime, duration))
+        
+        // Recording within 5s buffer before call end
+        assertTrue(RecordingMatcher.isRecordingAfterCallEnd(callEnd - 3000, callTime, duration))
+    }
+
+    @Test
+    fun isRecordingAfterCallEnd_beforeBuffer_returnsFalse() {
+        val callTime = 1000000L
+        val duration = 60
+        val callEnd = callTime + (duration * 1000L)
+        
+        // Recording way before call ended
+        assertFalse(RecordingMatcher.isRecordingAfterCallEnd(callTime, callTime, duration))
+    }
+
+    @Test
+    fun stripEmojis_plainText_unchanged() {
+        assertEquals("John Doe", RecordingMatcher.stripEmojis("John Doe"))
+        assertEquals("Test 123", RecordingMatcher.stripEmojis("Test 123"))
+    }
 }

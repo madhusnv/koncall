@@ -1,14 +1,17 @@
 defmodule KoncallApiWeb.Admin.ReportLive.LeadCalls do
   use KoncallApiWeb, :live_view
-  alias KoncallApi.{CRM, CallTracking}
+  alias KoncallApi.{Accounts, CRM, CallTracking}
 
   @impl true
-  def mount(%{"id" => lead_id}, _session, socket) do
+  def mount(%{"id" => lead_id}, session, socket) do
+    user_id = session["admin_user_id"]
+    current_user = Accounts.get_user!(user_id)
     lead = CRM.get_lead!(lead_id)
     call_logs = CallTracking.list_lead_call_logs(lead_id)
 
     {:ok, assign(socket,
       page_title: "Call History: #{lead.student_name}",
+      current_user: current_user,
       lead: lead,
       call_logs: call_logs
     )}
@@ -19,63 +22,7 @@ defmodule KoncallApiWeb.Admin.ReportLive.LeadCalls do
     ~H"""
     <div class="app-layout">
       <%!-- Sidebar Navigation --%>
-      <aside id="sidebar" class="sidebar">
-        <%!-- Collapse Toggle Button --%>
-        <button 
-          type="button" 
-          class="sidebar-collapse-toggle"
-          phx-click={JS.toggle_class("collapsed", to: "#sidebar")}
-          title="Toggle sidebar"
-        >
-          <.icon name="hero-chevron-left" class="w-4 h-4" />
-        </button>
-        
-        <div class="sidebar-header">
-          <a href="/admin/dashboard" class="sidebar-logo">
-            <div class="sidebar-logo-icon">
-              <.icon name="hero-phone" class="w-7 h-7 text-white" />
-            </div>
-            <div class="flex flex-col">
-              <span class="sidebar-logo-title">KonCall CRM</span>
-              <span class="sidebar-logo-subtitle">Education Consultancy</span>
-            </div>
-          </a>
-        </div>
-
-        <nav class="sidebar-nav">
-          <a href="/admin/dashboard" class="sidebar-nav-item">
-            <.icon name="hero-chart-bar" class="sidebar-nav-icon" />
-            <span>Dashboard</span>
-          </a>
-          <a href="/admin/branches" class="sidebar-nav-item">
-            <.icon name="hero-building-office" class="sidebar-nav-icon" />
-            <span>Branches</span>
-          </a>
-          <a href="/admin/universities" class="sidebar-nav-item">
-            <.icon name="hero-academic-cap" class="sidebar-nav-icon" />
-            <span>Universities</span>
-          </a>
-          <a href="/admin/users" class="sidebar-nav-item">
-            <.icon name="hero-users" class="sidebar-nav-icon" />
-            <span>Users</span>
-          </a>
-          <a href="/admin/leads" class="sidebar-nav-item">
-            <.icon name="hero-user-group" class="sidebar-nav-icon" />
-            <span>Leads</span>
-          </a>
-          <a href="/admin/reports" class="sidebar-nav-item active">
-            <.icon name="hero-document-chart-bar" class="sidebar-nav-icon" />
-            <span>Reports</span>
-          </a>
-        </nav>
-
-        <div class="p-4 border-t-2 border-[var(--color-border-light)]">
-          <a href="/admin/logout" class="sidebar-nav-item" style="color: var(--color-error);">
-            <.icon name="hero-arrow-right-on-rectangle" class="sidebar-nav-icon" />
-            <span>Log out</span>
-          </a>
-        </div>
-      </aside>
+    <.admin_sidebar current_user={@current_user} active_tab="reports" />
 
       <%!-- Main Content Area --%>
       <div class="main-content">

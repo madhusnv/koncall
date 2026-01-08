@@ -54,21 +54,81 @@ defmodule KoncallApi.CRM do
     |> paginate(params)
   end
 
-  @doc "Get leads with call statistics for a counsellor"
-  def get_counsellor_lead_stats(user_id) do
+  @doc "Get leads with call statistics for a counsellor with optional filters"
+  def get_counsellor_lead_stats(user_id, params \\ %{}) do
     Lead
     |> join(:left, [l], c in assoc(l, :call_logs))
     |> where([l, c], l.assigned_to == ^user_id and l.is_deleted == false)
+    |> filter_leads_by_stage(params["stage"])
+    |> filter_leads_by_search(params["search"])
+    |> filter_calls_by_date_range(params["date_filter"], params["start_date"], params["end_date"])
     |> group_by([l], l.id)
     |> select([l, c], %{
       lead: l,
       total_duration: sum(c.duration),
       total_calls: count(c.id),
-      last_call_at: max(c.call_datetime)
+      last_call_at: max(c.call_datetime),
+      calls_today: count(fragment("CASE WHEN DATE(?) = CURRENT_DATE THEN 1 END", c.call_datetime)),
+      duration_today: coalesce(sum(fragment("CASE WHEN DATE(?) = CURRENT_DATE THEN ? END", c.call_datetime, c.duration)), 0)
     })
     |> order_by([l, c], desc: max(c.call_datetime), desc: l.inserted_at)
     |> preload([:status, :university])
     |> Repo.all()
+  end
+
+  # Filter leads by stage (for counsellor stats)
+  defp filter_leads_by_stage(query, nil), do: query
+  defp filter_leads_by_stage(query, ""), do: query
+  defp filter_leads_by_stage(query, stage), do: where(query, [l], l.stage == ^stage)
+
+  # Filter leads by search (for counsellor stats)
+  defp filter_leads_by_search(query, nil), do: query
+  defp filter_leads_by_search(query, ""), do: query
+  defp filter_leads_by_search(query, search) do
+    pattern = "%#{search}%"
+    where(query, [l], 
+      ilike(l.student_name, ^pattern) or 
+      ilike(l.phone_number, ^pattern) or 
+      ilike(l.email, ^pattern)
+    )
+  end
+
+  # Filter by call date range (using call_logs join)
+  defp filter_calls_by_date_range(query, nil, _, _), do: query
+  defp filter_calls_by_date_range(query, "", _, _), do: query
+  defp filter_calls_by_date_range(query, "all", _, _), do: query
+  defp filter_calls_by_date_range(query, "today", _, _) do
+    where(query, [l, c], fragment("DATE(?) = CURRENT_DATE", c.call_datetime) or is_nil(c.id))
+  end
+  defp filter_calls_by_date_range(query, "week", _, _) do
+    where(query, [l, c], fragment("? >= CURRENT_DATE - INTERVAL '7 days'", c.call_datetime) or is_nil(c.id))
+  end
+  defp filter_calls_by_date_range(query, "month", _, _) do
+    where(query, [l, c], fragment("? >= CURRENT_DATE - INTERVAL '30 days'", c.call_datetime) or is_nil(c.id))
+  end
+  defp filter_calls_by_date_range(query, "custom", start_date, end_date) do
+    query
+    |> maybe_filter_start_date(start_date)
+    |> maybe_filter_end_date(end_date)
+  end
+  defp filter_calls_by_date_range(query, _, _, _), do: query
+
+  defp maybe_filter_start_date(query, nil), do: query
+  defp maybe_filter_start_date(query, ""), do: query
+  defp maybe_filter_start_date(query, start_date) do
+    case Date.from_iso8601(start_date) do
+      {:ok, date} -> where(query, [l, c], c.call_datetime >= ^DateTime.new!(date, ~T[00:00:00]) or is_nil(c.id))
+      _ -> query
+    end
+  end
+
+  defp maybe_filter_end_date(query, nil), do: query
+  defp maybe_filter_end_date(query, ""), do: query
+  defp maybe_filter_end_date(query, end_date) do
+    case Date.from_iso8601(end_date) do
+      {:ok, date} -> where(query, [l, c], c.call_datetime <= ^DateTime.new!(date, ~T[23:59:59]) or is_nil(c.id))
+      _ -> query
+    end
   end
 
   @doc "Get a lead by ID"

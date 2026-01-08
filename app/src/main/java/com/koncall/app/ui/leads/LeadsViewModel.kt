@@ -123,6 +123,11 @@ class LeadsViewModel @Inject constructor(
     fun updateLeadStage(leadId: String, newStage: String) {
         viewModelScope.launch {
             leadRepository.updateLeadStage(leadId, newStage)
+                .onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        error = error.message
+                    )
+                }
         }
     }
     

@@ -30,19 +30,35 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("release.keystore")
+            storePassword = "android"
+            keyAlias = "konfido"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
+        val localProperties = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localProperties.load(FileInputStream(localFile))
+        }
+
         debug {
-            val localProperties = Properties()
-            val localFile = rootProject.file("local.properties")
-            if (localFile.exists()) {
-                localProperties.load(FileInputStream(localFile))
-            }
-            val baseUrl = localProperties.getProperty("BASE_URL") ?: "http://192.168.1.19:4000/"
+            val baseUrl = localProperties.getProperty("DEBUG_BASE_URL") 
+                ?: localProperties.getProperty("BASE_URL") 
+                ?: "http://192.168.1.19:4000/"
             buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
-            buildConfigField("String", "BASE_URL", "\"https://api.koncall.com/\"")
+            val baseUrl = localProperties.getProperty("PROD_BASE_URL") 
+                ?: throw GradleException("PROD_BASE_URL not found in local.properties. Please add it to build release.")
+            
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -119,6 +135,8 @@ dependencies {
     
     // Testing
     testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

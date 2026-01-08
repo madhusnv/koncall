@@ -39,8 +39,8 @@ out/
 hs_err_pid*
 replay_pid*
 
-# Local configuration file
-local.properties
+# Local configuration file (now tracked for BASE_URL config)
+# local.properties
 
 # Keystore files
 *.jks

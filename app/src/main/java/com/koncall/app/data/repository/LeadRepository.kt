@@ -100,15 +100,22 @@ class LeadRepository @Inject constructor(
     
     /**
      * Update lead stage (Education CRM)
+     * Uses optimistic update with rollback on failure.
      */
     suspend fun updateLeadStage(leadId: String, newStage: String): Result<LeadEntity> {
+        // 1. Get current state BEFORE updating (for rollback)
+        val previousLead = leadDao.getLeadById(leadId)
+            ?: return Result.failure(Exception("Lead not found"))
+        val previousStage = previousLead.stage
+        
+        // 2. Optimistic update for instant UI feedback
+        leadDao.updateLeadStage(leadId, newStage)
+        
+        // 3. Sync to server
         return try {
-            // Update locally first for instant feedback
-            leadDao.updateLeadStage(leadId, newStage)
-            
-            // Sync to server
             val request = UpdateStageRequest(stage = newStage)
             val response = apiService.updateLeadStage(leadId, request)
+            
             if (response.isSuccessful) {
                 val lead = response.body()?.data?.toEntity()
                 if (lead != null) {
@@ -120,10 +127,13 @@ class LeadRepository @Inject constructor(
                     Result.success(localLead ?: throw Exception("Lead not found"))
                 }
             } else {
-                // Revert local change on failure
+                // 4. ROLLBACK on API failure
+                leadDao.updateLeadStage(leadId, previousStage)
                 Result.failure(Exception("Failed to update stage: ${response.code()}"))
             }
         } catch (e: Exception) {
+            // 4. ROLLBACK on network/other exception
+            leadDao.updateLeadStage(leadId, previousStage)
             Result.failure(e)
         }
     }

@@ -636,4 +636,97 @@ defmodule KoncallApiWeb.CoreComponents do
     |> JS.remove_class("overflow-hidden", to: "body")
     |> JS.pop_focus()
   end
+  @doc """
+  Renders the admin sidebar navigation.
+
+  ## Examples
+
+      <.admin_sidebar current_user={@current_user} active_tab="dashboard" />
+  """
+  attr :current_user, :map, required: true
+  attr :active_tab, :string, default: "dashboard"
+
+  def admin_sidebar(assigns) do
+    ~H"""
+    <aside id="sidebar" class="sidebar">
+      <%!-- Collapse Toggle Button --%>
+      <button 
+        type="button" 
+        class="sidebar-collapse-toggle"
+        phx-click={JS.toggle_class("collapsed", to: "#sidebar")}
+        title="Toggle sidebar"
+      >
+        <.icon name="hero-chevron-left" class="w-4 h-4" />
+      </button>
+      
+      <div class="sidebar-header">
+        <a href="/admin/dashboard" class="sidebar-logo">
+          <div class="sidebar-logo-icon">
+            <.icon name="hero-phone" class="w-7 h-7 text-white" />
+          </div>
+          <div class="flex flex-col">
+            <span class="sidebar-logo-title">KonCall CRM</span>
+            <span class="sidebar-logo-subtitle">Education Consultancy</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class={["sidebar-nav-item", @active_tab == "dashboard" && "active"]}>
+          <.icon name="hero-chart-bar" class="sidebar-nav-icon" />
+          <span>Dashboard</span>
+        </a>
+        
+        <%= if @current_user.role == "admin" do %>
+          <a href="/admin/branches" class={["sidebar-nav-item", @active_tab == "branches" && "active"]}>
+            <.icon name="hero-building-office" class="sidebar-nav-icon" />
+            <span>Branches</span>
+          </a>
+          <a href="/admin/universities" class={["sidebar-nav-item", @active_tab == "universities" && "active"]}>
+            <.icon name="hero-academic-cap" class="sidebar-nav-icon" />
+            <span>Universities</span>
+          </a>
+          <a href="/admin/users" class={["sidebar-nav-item", @active_tab == "users" && "active"]}>
+            <.icon name="hero-users" class="sidebar-nav-icon" />
+            <span>Users</span>
+          </a>
+        <% end %>
+
+        <a href="/admin/leads" class={["sidebar-nav-item", @active_tab == "leads" && "active"]}>
+          <.icon name="hero-user-group" class="sidebar-nav-icon" />
+          <span>Leads</span>
+        </a>
+        <a href="/admin/analytics" class={["sidebar-nav-item", @active_tab == "analytics" && "active"]}>
+          <.icon name="hero-chart-pie" class="sidebar-nav-icon" />
+          <span>Analytics</span>
+        </a>
+        <a href="/admin/reports" class={["sidebar-nav-item", @active_tab == "reports" && "active"]}>
+          <.icon name="hero-document-chart-bar" class="sidebar-nav-icon" />
+          <span>Reports</span>
+        </a>
+
+        <%= if @current_user.role == "admin" and Application.get_env(:koncall_api, :dev_routes) do %>
+          <a href="/dev/dashboard" target="_blank" class="sidebar-nav-item">
+            <.icon name="hero-server-stack" class="sidebar-nav-icon" />
+            <span>Metrics</span>
+          </a>
+        <% end %>
+      </nav>
+
+      <div class="p-4 border-t-2 border-[var(--color-border-light)]">
+        <div class="flex items-center gap-3 p-3 rounded-xl" style="background: var(--color-bg-secondary);">
+          <.icon name="hero-user-circle-solid" class="w-10 h-10" style="color: var(--color-primary);" />
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-sm truncate" style="color: var(--color-text-primary);"><%= @current_user.name %></div>
+            <div class="text-xs capitalize" style="color: var(--color-text-muted);"><%= @current_user.role %></div>
+          </div>
+        </div>
+        <a href="/admin/logout" class="sidebar-nav-item mt-2" style="color: var(--color-error);">
+          <.icon name="hero-arrow-right-on-rectangle" class="sidebar-nav-icon" />
+          <span>Log out</span>
+        </a>
+      </div>
+    </aside>
+    """
+  end
 end
