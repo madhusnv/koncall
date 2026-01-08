@@ -86,3 +86,4 @@ logs/
 
 # Gemini AI artifacts
 .gemini/
+.env.prod
