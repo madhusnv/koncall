@@ -1,12 +1,15 @@
 defmodule KoncallApiWeb.Api.RecordingController do
   @moduledoc """
   Controller for uploading and serving call recordings.
-  For local testing - stores files in priv/static/uploads/recordings/
+  Stores files in priv/static/uploads/recordings/
   """
   use KoncallApiWeb, :controller
   alias KoncallApi.Guardian
 
-  @upload_dir "priv/static/uploads/recordings"
+  # Use absolute path for Docker compatibility
+  defp upload_dir do
+    Path.join(Application.app_dir(:koncall_api, "priv/static"), "uploads/recordings")
+  end
 
   @doc """
   Upload a recording file.
@@ -23,13 +26,13 @@ defmodule KoncallApiWeb.Api.RecordingController do
       |> json(%{error: "No file provided"})
     else
       # Ensure upload directory exists
-      File.mkdir_p!(@upload_dir)
+      File.mkdir_p!(upload_dir())
       
       # Generate unique filename
       timestamp = System.system_time(:millisecond)
       user_id = Guardian.Plug.current_claims(conn)["user_id"]
       filename = "#{user_id}_#{timestamp}_#{upload.filename}"
-      dest_path = Path.join(@upload_dir, filename)
+      dest_path = Path.join(upload_dir(), filename)
       
       # Copy uploaded file
       File.cp!(upload.path, dest_path)
