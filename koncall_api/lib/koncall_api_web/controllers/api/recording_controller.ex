@@ -9,9 +9,16 @@ defmodule KoncallApiWeb.Api.RecordingController do
   use KoncallApiWeb, :controller
   alias KoncallApi.Guardian
 
-  # Use absolute path for Docker compatibility
+  # Use absolute path that matches Docker volume mount: ./uploads:/app/priv/static/uploads
+  # In development, fall back to relative path
   defp upload_dir do
-    Path.join(Application.app_dir(:koncall_api, "priv/static"), "uploads/recordings")
+    if File.dir?("/app/priv/static") do
+      # Docker/Release environment
+      "/app/priv/static/uploads/recordings"
+    else
+      # Local development
+      Path.join(File.cwd!(), "priv/static/uploads/recordings")
+    end
   end
 
   @doc """
