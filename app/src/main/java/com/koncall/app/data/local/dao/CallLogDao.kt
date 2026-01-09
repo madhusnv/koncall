@@ -127,4 +127,17 @@ interface CallLogDao {
     
     @Query("SELECT * FROM call_logs WHERE hasRecording = 1 AND recordingSyncStatus = :status")
     suspend fun getCallsWithRecordingByStatus(status: String): List<CallLogEntity>
+    
+    /**
+     * Fix stale PENDING records that already have serverUrl.
+     * This handles records from before the bug fix where status was never updated.
+     */
+    @Query("""
+        UPDATE call_logs 
+        SET recordingSyncStatus = 'uploaded', updatedAt = :updatedAt
+        WHERE recordingServerUrl IS NOT NULL 
+        AND recordingServerUrl != ''
+        AND recordingSyncStatus = 'pending'
+    """)
+    suspend fun fixStaleRecordingStatus(updatedAt: Long = System.currentTimeMillis()): Int
 }

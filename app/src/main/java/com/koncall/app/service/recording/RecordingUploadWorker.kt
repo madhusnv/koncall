@@ -60,6 +60,13 @@ class RecordingUploadWorker @AssistedInject constructor(
     
     override suspend fun doWork(): Result {
         return try {
+            // First, fix any stale PENDING records that already have serverUrl
+            // This cleans up records from before the bug was fixed
+            val fixedCount = callLogDao.fixStaleRecordingStatus()
+            if (fixedCount > 0) {
+                Log.d(TAG, "Fixed $fixedCount stale records at startup")
+            }
+            
             val recordingId = inputData.getString(KEY_RECORDING_ID)
             val batchMode = inputData.getBoolean(KEY_BATCH_MODE, false)
             
@@ -128,6 +135,10 @@ class RecordingUploadWorker @AssistedInject constructor(
     
     /**
      * Upload all pending recordings
+     * 
+     * Features client-side deduplication:
+     * - Skips recordings that already have serverUrl in local DB
+     * - Fixes stale PENDING status for records that were uploaded before
      */
     private suspend fun uploadPendingRecordings(): Pair<Int, Int> {
         // Get calls with recordings that need upload
@@ -135,9 +146,20 @@ class RecordingUploadWorker @AssistedInject constructor(
         
         var successful = 0
         var failed = 0
+        var skipped = 0
         
         for (call in pendingCalls) {
             val uri = call.recordingUri ?: continue
+            
+            // Client-side deduplication: skip if already has server URL
+            // This fixes stale records from before the bug was fixed
+            if (call.recordingServerUrl != null && call.recordingServerUrl.isNotEmpty()) {
+                Log.d(TAG, "Skipping ${call.id} - already has serverUrl: ${call.recordingServerUrl}")
+                // Fix the stale PENDING status
+                callLogDao.updateRecordingUpload(call.id, RecordingSyncStatus.UPLOADED, call.recordingServerUrl)
+                skipped++
+                continue
+            }
             
             // Must use serverId (backend's call_log ID) for API, but local id for DB updates
             val serverCallLogId = call.serverId
@@ -158,6 +180,10 @@ class RecordingUploadWorker @AssistedInject constructor(
             } else {
                 failed++
             }
+        }
+        
+        if (skipped > 0) {
+            Log.d(TAG, "Fixed $skipped stale records that were already uploaded")
         }
         
         return Pair(successful, failed)
