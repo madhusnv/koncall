@@ -99,12 +99,31 @@ class RecordingUploadWorker @AssistedInject constructor(
             return false
         }
         
-        if (recording.matchedCallLogId == null) {
+        val localCallLogId = recording.matchedCallLogId
+        if (localCallLogId == null) {
             Log.w(TAG, "Recording not matched to a call: $recordingId")
             return false
         }
         
-        return uploadRecording(recording.id, Uri.parse(recording.uri), recording.matchedCallLogId)
+        // Look up call log to get server ID
+        val callLog = callLogDao.getCallLogById(localCallLogId)
+        if (callLog == null) {
+            Log.w(TAG, "Call log not found for recording: $recordingId")
+            return false
+        }
+        
+        val serverCallLogId = callLog.serverId
+        if (serverCallLogId == null) {
+            Log.w(TAG, "Call log ${callLog.id} has no serverId, cannot upload")
+            return false
+        }
+        
+        return uploadRecording(
+            recordingId = recording.id,
+            uri = Uri.parse(recording.uri),
+            localCallLogId = localCallLogId,
+            serverCallLogId = serverCallLogId
+        )
     }
     
     /**
@@ -120,7 +139,7 @@ class RecordingUploadWorker @AssistedInject constructor(
         for (call in pendingCalls) {
             val uri = call.recordingUri ?: continue
             
-            // Must use serverId (backend's call_log ID) not local id
+            // Must use serverId (backend's call_log ID) for API, but local id for DB updates
             val serverCallLogId = call.serverId
             if (serverCallLogId == null) {
                 Log.w(TAG, "Call ${call.id} has no serverId, skipping upload")
@@ -130,7 +149,8 @@ class RecordingUploadWorker @AssistedInject constructor(
             val success = uploadRecording(
                 recordingId = null,
                 uri = Uri.parse(uri),
-                callLogId = serverCallLogId
+                localCallLogId = call.id,      // Local ID for DB updates
+                serverCallLogId = serverCallLogId  // Server ID for API
             )
             
             if (success) {
@@ -145,20 +165,26 @@ class RecordingUploadWorker @AssistedInject constructor(
     
     /**
      * Upload a recording file to the server
+     * 
+     * @param recordingId Optional recording entity ID
+     * @param uri URI of the recording file
+     * @param localCallLogId Local database ID (for updating local status)
+     * @param serverCallLogId Server's call_log ID (for linking on backend)
      */
     private suspend fun uploadRecording(
         recordingId: String?,
         uri: Uri,
-        callLogId: String
+        localCallLogId: String,
+        serverCallLogId: String
     ): Boolean {
         try {
-            // Update status to uploading
-            callLogDao.updateRecordingUpload(callLogId, RecordingSyncStatus.UPLOADING, null)
+            // Update status to uploading (using LOCAL id)
+            callLogDao.updateRecordingUpload(localCallLogId, RecordingSyncStatus.UPLOADING, null)
             
             // Get file from URI
             val tempFile = copyToTempFile(uri) ?: run {
                 Log.e(TAG, "Failed to create temp file for upload")
-                callLogDao.updateRecordingUpload(callLogId, RecordingSyncStatus.FAILED, null)
+                callLogDao.updateRecordingUpload(localCallLogId, RecordingSyncStatus.FAILED, null)
                 return false
             }
             
@@ -175,9 +201,10 @@ class RecordingUploadWorker @AssistedInject constructor(
                 
                 val requestBody = tempFile.asRequestBody(mimeType)
                 val filePart = MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
-                val callLogIdBody = callLogId.toRequestBody("text/plain".toMediaTypeOrNull())
+                // Use SERVER ID for the API call
+                val callLogIdBody = serverCallLogId.toRequestBody("text/plain".toMediaTypeOrNull())
                 
-                // Upload to server with call_log_id
+                // Upload to server with server's call_log_id
                 val response = apiService.uploadRecording(filePart, callLogIdBody)
                 
                 if (response.isSuccessful) {
@@ -185,9 +212,9 @@ class RecordingUploadWorker @AssistedInject constructor(
                     val serverUrl = uploadResponse?.url
                     
                     if (serverUrl != null) {
-                        // Update call log with server URL
+                        // Update call log with server URL (using LOCAL id)
                         callLogDao.updateRecordingUpload(
-                            callLogId = callLogId,
+                            callLogId = localCallLogId,
                             status = RecordingSyncStatus.UPLOADED,
                             serverUrl = serverUrl
                         )
@@ -204,7 +231,7 @@ class RecordingUploadWorker @AssistedInject constructor(
                 }
                 
                 Log.e(TAG, "Upload failed: ${response.code()} ${response.message()}")
-                callLogDao.updateRecordingUpload(callLogId, RecordingSyncStatus.FAILED, null)
+                callLogDao.updateRecordingUpload(localCallLogId, RecordingSyncStatus.FAILED, null)
                 
                 if (recordingId != null) {
                     recordingDao.markUploadFailed(recordingId, UploadStatus.FAILED, response.message())
@@ -219,7 +246,7 @@ class RecordingUploadWorker @AssistedInject constructor(
             
         } catch (e: Exception) {
             Log.e(TAG, "Error uploading recording", e)
-            callLogDao.updateRecordingUpload(callLogId, RecordingSyncStatus.FAILED, null)
+            callLogDao.updateRecordingUpload(localCallLogId, RecordingSyncStatus.FAILED, null)
             return false
         }
     }
