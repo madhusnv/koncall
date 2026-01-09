@@ -117,4 +117,20 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Req
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  
+  # Backblaze B2 configuration (S3-compatible)
+  config :ex_aws,
+    access_key_id: System.get_env("B2_KEY_ID", "005cd405429f6d80000000001"),
+    secret_access_key: System.get_env("B2_APPLICATION_KEY", "K005ZrSmftPaxoXt8wbYOHvw4zqIInY"),
+    region: "us-east-005"
+  
+  config :ex_aws, :s3,
+    scheme: "https://",
+    host: System.get_env("B2_ENDPOINT", "s3.us-east-005.backblazeb2.com"),
+    region: "us-east-005"
+  
+  # Recording storage config
+  config :koncall_api, :recording_storage,
+    bucket: System.get_env("B2_BUCKET", "koncall"),
+    public_url: System.get_env("B2_PUBLIC_URL", "https://f005.backblazeb2.com/file/koncall")
 end

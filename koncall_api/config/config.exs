@@ -60,6 +60,11 @@ config :logger, :default_formatter,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# ExAWS configuration for Backblaze B2
+config :ex_aws,
+  json_codec: Jason,
+  http_client: ExAws.Request.Hackney
+
 # Guardian JWT configuration
 config :koncall_api, KoncallApi.Guardian,
   issuer: "koncall_api",

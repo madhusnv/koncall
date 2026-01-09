@@ -1,33 +1,22 @@
 defmodule KoncallApiWeb.Api.RecordingController do
   @moduledoc """
-  Controller for uploading and serving call recordings.
-  Stores files in priv/static/uploads/recordings/
+  Controller for uploading call recordings to Backblaze B2 (S3-compatible).
   
-  Features server-side deduplication: if a call_log already has a recording,
-  returns the existing URL instead of saving a duplicate.
+  Features:
+  - Uploads recordings to B2 bucket
+  - Server-side deduplication (skips if recording_url exists)
+  - Returns public URL for streaming
   """
   use KoncallApiWeb, :controller
   alias KoncallApi.Guardian
-
-  # Use absolute path that matches Docker volume mount: ./uploads:/app/priv/static/uploads
-  # In development, fall back to relative path
-  defp upload_dir do
-    if File.dir?("/app/priv/static") do
-      # Docker/Release environment
-      "/app/priv/static/uploads/recordings"
-    else
-      # Local development
-      Path.join(File.cwd!(), "priv/static/uploads/recordings")
-    end
-  end
+  alias ExAws.S3
 
   @doc """
-  Upload a recording file.
+  Upload a recording file to Backblaze B2.
   POST /api/recordings/upload
   Multipart form with: file (the .aac file), call_log_id (optional)
   
-  Server-side deduplication: If call_log already has recording_url, 
-  returns existing URL with skipped: true instead of saving duplicate.
+  Deduplication: If call_log already has recording_url, returns existing URL.
   """
   def upload(conn, params) do
     upload = params["file"]
@@ -50,7 +39,7 @@ defmodule KoncallApiWeb.Api.RecordingController do
         })
       
       true ->
-        save_and_link_recording(conn, upload, call_log_id)
+        upload_to_b2(conn, upload, call_log_id)
     end
   end
   
@@ -70,42 +59,77 @@ defmodule KoncallApiWeb.Api.RecordingController do
     end
   end
   
-  # Save the uploaded file and link to call_log
-  defp save_and_link_recording(conn, upload, call_log_id) do
-    # Ensure upload directory exists
-    File.mkdir_p!(upload_dir())
+  # Upload file to Backblaze B2
+  defp upload_to_b2(conn, upload, call_log_id) do
+    # Get storage config
+    storage_config = Application.get_env(:koncall_api, :recording_storage, [])
+    bucket = Keyword.get(storage_config, :bucket, "koncall")
+    public_url_base = Keyword.get(storage_config, :public_url, "https://f005.backblazeb2.com/file/koncall")
     
     # Generate unique filename
     timestamp = System.system_time(:millisecond)
     user_id = Guardian.Plug.current_claims(conn)["user_id"]
-    filename = "#{user_id}_#{timestamp}_#{upload.filename}"
-    dest_path = Path.join(upload_dir(), filename)
+    # Sanitize filename - remove problematic characters
+    safe_filename = 
+      upload.filename
+      |> String.replace(~r/[^\w\.\-]/, "_")
+    filename = "recordings/#{user_id}_#{timestamp}_#{safe_filename}"
     
-    # Copy uploaded file
-    File.cp!(upload.path, dest_path)
+    # Read file content
+    file_content = File.read!(upload.path)
+    file_size = byte_size(file_content)
     
-    # Return the URL to access the file
-    base_url = KoncallApiWeb.Endpoint.url()
-    file_url = "#{base_url}/uploads/recordings/#{filename}"
+    # Determine content type
+    content_type = upload.content_type || guess_content_type(upload.filename)
     
-    # Link recording to call log if call_log_id provided
-    if call_log_id && call_log_id != "" do
-      case KoncallApi.CallTracking.get_call_log(call_log_id) do
-        nil -> :ok
-        call_log ->
-          KoncallApi.CallTracking.add_recording(call_log, %{
-            "recording_url" => file_url,
-            "has_recording" => true,
-            "recording_size" => File.stat!(dest_path).size
-          })
-      end
+    # Upload to B2
+    case S3.put_object(bucket, filename, file_content, [
+      content_type: content_type,
+      acl: :public_read
+    ]) |> ExAws.request() do
+      {:ok, _response} ->
+        # Generate public URL
+        file_url = "#{public_url_base}/#{filename}"
+        
+        # Link recording to call log if call_log_id provided
+        if call_log_id && call_log_id != "" do
+          case KoncallApi.CallTracking.get_call_log(call_log_id) do
+            nil -> :ok
+            call_log ->
+              KoncallApi.CallTracking.add_recording(call_log, %{
+                "recording_url" => file_url,
+                "has_recording" => true,
+                "recording_size" => file_size
+              })
+          end
+        end
+        
+        json(conn, %{
+          success: true,
+          filename: filename,
+          url: file_url,
+          size: file_size
+        })
+        
+      {:error, error} ->
+        require Logger
+        Logger.error("B2 upload failed: #{inspect(error)}")
+        
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: "Upload failed", details: inspect(error)})
     end
-    
-    json(conn, %{
-      success: true,
-      filename: filename,
-      url: file_url,
-      size: File.stat!(dest_path).size
-    })
+  end
+  
+  defp guess_content_type(filename) do
+    case Path.extname(filename) |> String.downcase() do
+      ".m4a" -> "audio/mp4"
+      ".aac" -> "audio/aac"
+      ".mp3" -> "audio/mpeg"
+      ".amr" -> "audio/amr"
+      ".ogg" -> "audio/ogg"
+      ".wav" -> "audio/wav"
+      _ -> "audio/mpeg"
+    end
   end
 end
